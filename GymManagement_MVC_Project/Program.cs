@@ -1,3 +1,5 @@
+using GymManagementProject.Data.Seeder;
+
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
@@ -21,5 +23,6 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+await DatabaseSeeder.SeedAllAsync();
 
 app.Run();
