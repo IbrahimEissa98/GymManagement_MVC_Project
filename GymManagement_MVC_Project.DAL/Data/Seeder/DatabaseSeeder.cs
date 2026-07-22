@@ -4,9 +4,8 @@ namespace GymManagement_MVC_Project.DAL.Data.Seeder;
 
 public static class DatabaseSeeder
 {
-    public static async Task SeedAllAsync()
+    public static async Task SeedAllAsync(GymDbContext dbContext)
     {
-        using var dbContext = new GymDbContext();
         await PlanSeeder.SeedPlansAsync(dbContext);
     }
 }

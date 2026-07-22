@@ -1,4 +1,5 @@
 ﻿using GymManagement_MVC_Project.DAL.Data.Contexts;
+using GymManagement_MVC_Project.DAL.Repositories.Plans;
 using Microsoft.AspNetCore.Mvc;
 using Microsoft.EntityFrameworkCore;
 
@@ -6,11 +7,16 @@ namespace GymManagement_MVC_Project.PL.Controllers;
 
 public class PlanController : Controller
 {
-    private readonly GymDbContext _gymDbContext = new GymDbContext();
+    private readonly IPlanRepository _planRepo;
+
+    public PlanController(IPlanRepository planRepo)
+    {
+        _planRepo = planRepo;
+    }
 
     public async Task<IActionResult> Index()
     {
-        var plans = await _gymDbContext.Plans.ToListAsync();
+        var plans = await _planRepo.GetAllPlansAsync();
 
         return View(plans);
     }
@@ -22,7 +28,7 @@ public class PlanController : Controller
         {
             return NotFound();
         }
-        var plan = await _gymDbContext.Plans.FindAsync(id);
+        var plan = await _planRepo.GetPlanByIdAsync(id);
 
         if (plan is null)
             return RedirectToAction(nameof(Index));

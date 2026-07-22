@@ -7,13 +7,9 @@ namespace GymManagement_MVC_Project.DAL.Data.Contexts;
 
 public class GymDbContext : DbContext
 {
-    protected override void OnConfiguring(DbContextOptionsBuilder optionsBuilder)
+    public GymDbContext(DbContextOptions<GymDbContext> options):base(options)
     {
-        optionsBuilder.UseSqlServer("Server = .; Database = GymProject_MVC_Db; Trusted_Connection = True; TrustServerCertificate = True;");
-
-        optionsBuilder.LogTo(Console.WriteLine, LogLevel.Information);
-
-        optionsBuilder.AddInterceptors(new TimestampInterceptor());
+        
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
