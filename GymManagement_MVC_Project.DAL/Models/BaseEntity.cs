@@ -1,4 +1,4 @@
-﻿namespace GymManagementProject.Models;
+﻿namespace GymManagement_MVC_Project.DAL.Models;
 
 public class BaseEntity
 {

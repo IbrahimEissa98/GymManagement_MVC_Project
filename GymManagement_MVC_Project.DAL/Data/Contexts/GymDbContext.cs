@@ -1,8 +1,9 @@
-﻿using GymManagementProject.Models;
-using GymManagementProject.Models.Interceptors;
+﻿using GymManagement_MVC_Project.DAL.Models;
+using GymManagement_MVC_Project.DAL.Models.Interceptors;
 using Microsoft.EntityFrameworkCore;
+using Microsoft.Extensions.Logging;
 
-namespace GymManagementProject.Data.Contexts;
+namespace GymManagement_MVC_Project.DAL.Data.Contexts;
 
 public class GymDbContext : DbContext
 {

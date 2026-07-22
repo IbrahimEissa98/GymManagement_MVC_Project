@@ -1,8 +1,8 @@
-﻿using GymManagementProject.Data.Contexts;
-using GymManagementProject.Models;
+﻿using GymManagement_MVC_Project.DAL.Data.Contexts;
+using GymManagement_MVC_Project.DAL.Models;
 using Microsoft.EntityFrameworkCore;
 
-namespace GymManagementProject.Data.Seeder
+namespace GymManagement_MVC_Project.DAL.Data.Seeder
 {
     internal class PlanSeeder
     {

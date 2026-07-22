@@ -1,6 +1,6 @@
-﻿using GymManagementProject.Models.Interceptors;
+﻿using GymManagement_MVC_Project.DAL.Models.Interceptors;
 
-namespace GymManagementProject.Models;
+namespace GymManagement_MVC_Project.DAL.Models;
 
 public class Plan : BaseEntity, IHasTimestamps
 {

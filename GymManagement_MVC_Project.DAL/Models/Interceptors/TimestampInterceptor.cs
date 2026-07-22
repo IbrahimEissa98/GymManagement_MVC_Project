@@ -1,7 +1,7 @@
 ﻿using Microsoft.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore.Diagnostics;
 
-namespace GymManagementProject.Models.Interceptors;
+namespace GymManagement_MVC_Project.DAL.Models.Interceptors;
 
 public class TimestampInterceptor : SaveChangesInterceptor
 {

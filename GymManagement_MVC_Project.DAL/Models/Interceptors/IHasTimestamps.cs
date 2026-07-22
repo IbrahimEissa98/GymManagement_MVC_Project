@@ -1,4 +1,4 @@
-﻿namespace GymManagementProject.Models.Interceptors;
+﻿namespace GymManagement_MVC_Project.DAL.Models.Interceptors;
 
 public interface IHasTimestamps
 {

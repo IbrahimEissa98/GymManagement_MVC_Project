@@ -1,6 +1,6 @@
-﻿using GymManagementProject.Data.Contexts;
+﻿using GymManagement_MVC_Project.DAL.Data.Contexts;
 
-namespace GymManagementProject.Data.Seeder;
+namespace GymManagement_MVC_Project.DAL.Data.Seeder;
 
 public static class DatabaseSeeder
 {
