@@ -11,12 +11,13 @@ var builder = WebApplication.CreateBuilder(args);
 builder.Services.AddControllersWithViews();
 
 builder.Services.AddScoped<IPlanRepository, PlanRepository>();
-builder.Services.AddDbContext<GymDbContext>(options =>
+builder.Services.AddSingleton<TimestampInterceptor>();
+builder.Services.AddDbContext<GymDbContext>((sp, options) =>
 {
     options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
     options.LogTo(Console.WriteLine, LogLevel.Information);
 
-    options.AddInterceptors(new TimestampInterceptor());
+    options.AddInterceptors(sp.GetRequiredService<TimestampInterceptor>());
 });
 
 var app = builder.Build();

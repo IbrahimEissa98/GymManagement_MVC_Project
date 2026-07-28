@@ -40,6 +40,16 @@ public class TimestampInterceptor : SaveChangesInterceptor
                 // Prevent CreatedAt from being overwritten on update
                 entry.Property(nameof(IHasTimestamps.CreatedAt)).IsModified = false;
             }
+            else if (entry.State == EntityState.Deleted)
+            {
+                entry.State = EntityState.Modified;
+                entry.Entity.IsDeleted = true;
+                entry.Entity.DeletedAt = DateTime.UtcNow;
+
+                // Prevent CreatedAt from being overwritten on update
+                entry.Property(nameof(IHasTimestamps.CreatedAt)).IsModified = false;
+                entry.Property(nameof(IHasTimestamps.UpdatedAt)).IsModified = false;
+            }
         }
     }
 }
