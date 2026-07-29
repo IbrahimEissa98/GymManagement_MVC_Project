@@ -15,7 +15,8 @@ internal class BookingConfig : IEntityTypeConfiguration<Booking>
         {
             x.SessionId,
             x.MemberId
-        }).IsUnique();
+        }).IsUnique()
+            .HasFilter("IsDeleted = 0");
 
     }
 }

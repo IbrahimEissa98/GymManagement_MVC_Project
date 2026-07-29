@@ -46,13 +46,13 @@ internal class GymUserConfig<TEntity> : IEntityTypeConfiguration<TEntity> where 
         builder.ToTable(tb =>
         {
             tb.HasCheckConstraint("CK_Email", "Email Like '_%@__%.__%'");
-            tb.HasCheckConstraint("CK_Phone", 
+            tb.HasCheckConstraint("CK_Phone",
                 "Phone Like '01[0125]%' And Phone Not Like '%[^0-9]%' And Len(Phone) = 11");
-            tb.HasCheckConstraint("CK_DateOfBirth", 
+            tb.HasCheckConstraint("CK_DateOfBirth",
                 "DateOfBirth <= DateAdd(Year, -2, GetDate()) And DateOfBirth >= DateAdd(Year, -100, GetDate())");
         });
 
         builder.HasQueryFilter(u => !u.IsDeleted);
-                
+
     }
 }

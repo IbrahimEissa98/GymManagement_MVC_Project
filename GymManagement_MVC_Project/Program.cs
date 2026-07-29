@@ -1,32 +1,33 @@
+using GymManagement_MVC_Project.DAL;
 using GymManagement_MVC_Project.DAL.Data.Contexts;
 using GymManagement_MVC_Project.DAL.Data.Seeder;
-using GymManagement_MVC_Project.DAL.Models.Interceptors;
-using GymManagement_MVC_Project.DAL.Repositories.Plans;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Options;
 
 var builder = WebApplication.CreateBuilder(args);
 
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-builder.Services.AddScoped<IPlanRepository, PlanRepository>();
-builder.Services.AddSingleton<TimestampInterceptor>();
-builder.Services.AddDbContext<GymDbContext>((sp, options) =>
-{
-    options.UseSqlServer(builder.Configuration.GetConnectionString("DefaultConnection"));
-    options.LogTo(Console.WriteLine, LogLevel.Information);
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
+        ?? throw new InvalidOperationException("The DefaultConnection string not found");
 
-    options.AddInterceptors(sp.GetRequiredService<TimestampInterceptor>());
-});
+builder.Services.AddGymDataAccess(connectionString);
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
 if (!app.Environment.IsDevelopment())
 {
-    app.UseExceptionHandler("/Home/Error");
+    app.UseDeveloperExceptionPage();
 }
+else
+{
+    app.UseExceptionHandler("/Error/Error");
+    app.UseHsts();
+}
+
+app.UseStatusCodePagesWithReExecute("/Error/{0}");
+
 app.UseRouting();
 
 app.UseAuthorization();
@@ -38,10 +39,15 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
-await using var scope = app.Services.CreateAsyncScope();
+if (app.Environment.IsDevelopment())
+{
+    await using var scope = app.Services.CreateAsyncScope();
+    var dbContext = scope.ServiceProvider.GetRequiredService<GymDbContext>();
 
-var dbContext = scope.ServiceProvider.GetRequiredService<GymDbContext>();
+    //if(await dbContext.Database.GetPendingMigrationsAsync() is not null)
+    //    await dbContext.Database.MigrateAsync();
 
-await DatabaseSeeder.SeedAllAsync(dbContext);
+    await DatabaseSeeder.SeedAllAsync(dbContext);
+}
 
 app.Run();

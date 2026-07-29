@@ -18,6 +18,10 @@ internal class HealthRecordConfig : IEntityTypeConfiguration<HealthRecord>
                 .HasConversion<string>()
                 .HasMaxLength(20);
 
+        builder.Property(hr => hr.Note)
+                .HasColumnType("VarChar")
+                .HasMaxLength(500);
+
         builder.ToTable(t =>
         {
             t.HasCheckConstraint("CK_HealthRecord_Height", "Height > 0");
