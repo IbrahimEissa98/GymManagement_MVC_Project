@@ -10,7 +10,7 @@ internal class MemberConfig : GymUserConfig<Member>
     {
         base.Configure(builder);
 
-        builder.Property(u => u.CreatedAt)
-                .HasColumnName("JoinDate");
+        //builder.Property(u => u.CreatedAt)
+        //        .HasColumnName("JoinDate");
     }
 }

@@ -10,8 +10,8 @@ internal class TrainerConfig : GymUserConfig<Trainer>
     {
         base.Configure(builder);
 
-        builder.Property(u => u.CreatedAt)
-                .HasColumnName("HireDate");
+        //builder.Property(u => u.CreatedAt)
+        //        .HasColumnName("HireDate");
 
         builder.Property(t => t.Specialties)
                 .HasColumnType("VarChar")

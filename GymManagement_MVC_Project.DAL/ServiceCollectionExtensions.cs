@@ -1,6 +1,7 @@
 ﻿using GymManagement_MVC_Project.DAL.Data.Contexts;
 using GymManagement_MVC_Project.DAL.Models.Interceptors;
-using GymManagement_MVC_Project.DAL.Repositories.Plans;
+using GymManagement_MVC_Project.DAL.Repositories;
+using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
@@ -12,6 +13,8 @@ namespace GymManagement_MVC_Project.DAL
         public static IServiceCollection AddGymDataAccess(this IServiceCollection services, string connectionString)
         {
             services.AddScoped<IPlanRepository, PlanRepository>();
+            services.AddScoped<IMemberRepository, MemberRepository>();
+            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddSingleton<TimestampInterceptor>();
             services.AddDbContext<GymDbContext>((sp, options) =>
             {

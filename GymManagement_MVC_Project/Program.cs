@@ -1,3 +1,4 @@
+using GymManagement_MVC_Project.BLL;
 using GymManagement_MVC_Project.DAL;
 using GymManagement_MVC_Project.DAL.Data.Contexts;
 using GymManagement_MVC_Project.DAL.Data.Seeder;
@@ -12,11 +13,12 @@ var connectionString = builder.Configuration.GetConnectionString("DefaultConnect
         ?? throw new InvalidOperationException("The DefaultConnection string not found");
 
 builder.Services.AddGymDataAccess(connectionString);
+builder.Services.AddGymBusinessLogic();
 
 var app = builder.Build();
 
 // Configure the HTTP request pipeline.
-if (!app.Environment.IsDevelopment())
+if (app.Environment.IsDevelopment())
 {
     app.UseDeveloperExceptionPage();
 }
