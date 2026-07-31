@@ -4,6 +4,10 @@
 	ViewData["Title"] = "Members";
 }
 
+@section Styles{
+	<partial name="_BootstrapValidationClassesStylePartial" />
+}
+
 <div class="container pt-5">
 	<main role="main" class="pb-3 pt-5">
 
@@ -24,25 +28,8 @@
 			</div>
 		</header>
 
-		<form method="post">
+		<form method="post" class="needs-validation">
 
-			<!-- Step navigation -->
-			@* <ul class="nav nav-tabs mb-4" id="addMemberTabs" role="tablist">
-				<li class="nav-item" role="presentation">
-					<button class="nav-link active" id="member-tab" data-bs-toggle="tab" data-bs-target="#member-info"
-							type="button" role="tab">
-						Member Info
-					</button>
-				</li>
-				<li class="nav-item" role="presentation">
-					<button class="nav-link" id="health-tab" data-bs-toggle="tab" data-bs-target="#health-info"
-							type="button" role="tab">
-						Health Data
-					</button>
-				</li>
-			</ul> *@
-
-			<!-- Tab content -->
 			<!-- Member Info -->
 			<div class="section-header mb-3">
 				<h5 class="text-primary fw-bold">Personal Information</h5>
@@ -51,25 +38,30 @@
 			<div class="row g-3">
 				<div class="col-12 col-md-6">
 					<label asp-for="Name" class="form-label">Name</label>
-					<input asp-for="Name" type="text" class="form-control" />
+					<input asp-for="Name" class="form-control" required />
+					<span asp-validation-for="Name" class="text-danger"></span>
 				</div>
 				<div class="col-12 col-md-6">
 					<label asp-for="Email" class="form-label">Email</label>
 					<input asp-for="Email" type="text" class="form-control" />
+					<span asp-validation-for="Email" class="text-danger"></span>
 				</div>
 				<div class="col-12 col-md-6">
 					<label asp-for="Phone" class="form-label">Phone</label>
 					<input asp-for="Phone" type="text" class="form-control" />
+					<span asp-validation-for="Phone" class="text-danger"></span>
 				</div>
 				<div class="col-12 col-md-6">
 					<label asp-for="DateOfBirth" class="form-label">DateOfBirth</label>
 					<input asp-for="DateOfBirth" class="form-control" type="date" />
+					<span asp-validation-for="DateOfBirth" class="text-danger"></span>
 				</div>
 				<div class="col-12 col-md-6">
 					<label asp-for="Gender" class="form-label">Gender</label>
 					<select asp-for="Gender" class="form-select" asp-items="Html.GetEnumSelectList<GenderTypes>()">
-						<option value="">-- Select Gender --</option>
+						<option selected disabled value="">-- Select Gender --</option>
 					</select>
+					<span asp-validation-for="Gender" class="text-danger"></span>
 				</div>
 			</div>
 			<div class="section-header mb-3 mt-4">
@@ -81,15 +73,18 @@
 				<div class="col-12 col-md-6">
 					<label asp-for="BuildingNumber" class="form-label">BuildingNumber</label>
 					<input asp-for="BuildingNumber" class="form-control" />
+					<span asp-validation-for="BuildingNumber" class="text-danger"></span>
 				</div>
 
 				<div class="col-12 col-md-6">
 					<label asp-for="Street" class="form-label">Street</label>
 					<input asp-for="Street" class="form-control" />
+					<span asp-validation-for="Street" class="text-danger"></span>
 				</div>
 				<div class="col-12 col-md-6">
 					<label asp-for="City" class="form-label">City</label>
 					<input asp-for="City" class="form-control" />
+					<span asp-validation-for="City" class="text-danger"></span>
 				</div>
 			</div>
 
@@ -103,18 +98,21 @@
 				<div class="col-12 col-md-6">
 					<label asp-for="HealthRecord.Height" class="form-label">Height</label>
 					<input asp-for="HealthRecord.Height"  class="form-control" />
+					<span asp-validation-for="HealthRecord.Height" class="text-danger"></span>
 				</div>
 
 				<div class="col-12 col-md-6">
 					<label asp-for="HealthRecord.Weight" class="form-label">Weight</label>
 					<input asp-for="HealthRecord.Weight" class="form-control" />
+					<span asp-validation-for="HealthRecord.Weight" class="text-danger"></span>
 				</div>
 
 				<div class="col-12 col-md-6">
 					<label asp-for="HealthRecord.BloodType" class="form-label">Blood Type</label>
 					<select asp-for="HealthRecord.BloodType" class="form-select" asp-items="Html.GetEnumSelectList<BloodTypes>()">
-						<option value="">Select</option>
+						<option selected disabled value="">-- Select --</option>
 					</select>
+					<span asp-validation-for="HealthRecord.BloodType" class="text-danger"></span>
 				</div>
 				<div class="col-12 col-md-6">
 					<label asp-for="HealthRecord.Note" class="form-label">Note</label>
@@ -140,21 +138,31 @@
 
 
 @section Scripts {
-	<script src="../js/jquery.validate.min.js"></script>
-	<script src="../js/jquery.validate.unobtrusive.min.js"></script>
+	<partial name="_ValidationScriptsPartial" />
 	<script>
 		// Preview photo before upload
 		document.getElementById('photoInput').addEventListener('change', function (e) {
-		var file = e.target.files[0];
-		if (file) {
-		var reader = new FileReader();
-		reader.onload = function (e) {
-		var preview = document.getElementById('photoPreview');
-		preview.src = e.target.result;
-		preview.style.display = 'block';
-		}
-		reader.readAsDataURL(file);
-		}
+			var file = e.target.files[0];
+			if (file) {
+				var reader = new FileReader();
+				reader.onload = function (e) {
+					var preview = document.getElementById('photoPreview');
+					preview.src = e.target.result;
+					preview.style.display = 'block';
+				}
+				reader.readAsDataURL(file);
+			}
 		});
+	</script>
+	<script>
+		document.querySelectorAll(".form-control").forEach(input =>{
+		    if (input.classList.contains("input-validation-error")) {
+				input.classList.replace("is-valid", "is-invalid");
+				// input.classList.add("is-invalid");
+		    } else if (input.classList.contains("valid")) {
+				input.classList.remove("is-invalid");
+				input.classList.add("is-valid");
+		    }
+		})
 	</script>
 }

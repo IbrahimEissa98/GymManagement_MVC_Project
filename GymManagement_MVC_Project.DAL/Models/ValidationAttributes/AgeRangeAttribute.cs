@@ -2,7 +2,9 @@
 
 namespace GymManagement_MVC_Project.DAL.Models.ValidationAttributes;
 
-public class AgeRangeAttribute : ValidationAttribute
+[AttributeUsage(AttributeTargets.Property | AttributeTargets.Field | AttributeTargets.Parameter,
+        AllowMultiple = false)]
+public class AgeRangeAttribute(int minAge, int maxAge) : ValidationAttribute
 {
     public override bool IsValid(object? value)
     {
@@ -11,7 +13,7 @@ public class AgeRangeAttribute : ValidationAttribute
 
         var today = DateOnly.FromDateTime(DateTime.Now);
 
-        return dob <= today.AddYears(-2)
-            && dob >= today.AddYears(-100);
+        return dob <= today.AddYears(-minAge)
+            && dob >= today.AddYears(-maxAge);
     }
 }

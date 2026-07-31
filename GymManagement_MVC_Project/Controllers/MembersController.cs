@@ -21,6 +21,7 @@ public class MembersController(IMemberService memberService) : Controller
     }
 
     [HttpPost]
+    [ValidateAntiForgeryToken]
     public async Task<IActionResult> Create(MemberCreateViewModel model, CancellationToken ct)
     {
         if (!ModelState.IsValid)

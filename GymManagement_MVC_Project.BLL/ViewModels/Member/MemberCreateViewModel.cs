@@ -1,4 +1,5 @@
 ﻿using GymManagement_MVC_Project.DAL.Models.Enums;
+using GymManagement_MVC_Project.DAL.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
 using System.Reflection;
 
@@ -11,9 +12,8 @@ public class MemberCreateViewModel
     public string Name { get; set; } = default!;
 
     [Required(ErrorMessage = "Email Is Required")]
-    [EmailAddress(ErrorMessage = "Invalid email format")]
+    [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email address.")]
     [DataType(DataType.EmailAddress)]
-
     public string Email { get; set; } = default!;
 
     [Required(ErrorMessage = "Phone Number Is Required")]
@@ -23,6 +23,7 @@ public class MemberCreateViewModel
     public string Phone { get; set; } = default!;
 
     [Required(ErrorMessage = "Date of Birth is required")]
+    [AgeRange(2, 100, ErrorMessage = "Age out of range")]
     [DataType(DataType.Date)]
     public DateOnly DateOfBirth { get; set; }
 
