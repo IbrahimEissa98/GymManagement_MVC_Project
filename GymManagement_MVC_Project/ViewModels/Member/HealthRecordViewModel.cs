@@ -1,7 +1,7 @@
 ﻿using GymManagement_MVC_Project.DAL.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace GymManagement_MVC_Project.BLL.ViewModels.Member;
+namespace GymManagement_MVC_Project.PL.ViewModels.Member;
 
 public class HealthRecordViewModel
 {
@@ -13,6 +13,7 @@ public class HealthRecordViewModel
 
     [Required(ErrorMessage = "Blood Type Is Required")]
     [StringLength(3, ErrorMessage = "Blood type must be 3 characters or less")]
+    [EnumDataType(typeof(BloodTypes), ErrorMessage = "Invalid blood type")]
     public string BloodType { get; set; } = default!;
     public string? Note { get; set; } = default!;
 }

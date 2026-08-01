@@ -1,9 +1,9 @@
-﻿using GymManagement_MVC_Project.BLL.ViewModels.Member;
+﻿using GymManagement_MVC_Project.BLL.DTOs.Member;
 
 namespace GymManagement_MVC_Project.BLL.Services.Contracts;
 
 public interface IMemberService
 {
-    Task<IReadOnlyList<MemberIndexViewModel>> GetAllAsync(CancellationToken ct = default);
-    Task<bool> CreateAsync(MemberCreateViewModel createViewModel, CancellationToken ct = default);
+    Task<IReadOnlyList<MemberIndexDto>> GetAllAsync(CancellationToken ct = default);
+    Task<bool> CreateAsync(MemberCreateDto createDto, CancellationToken ct = default);
 }

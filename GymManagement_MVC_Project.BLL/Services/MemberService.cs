@@ -1,5 +1,5 @@
-﻿using GymManagement_MVC_Project.BLL.Services.Contracts;
-using GymManagement_MVC_Project.BLL.ViewModels.Member;
+﻿using GymManagement_MVC_Project.BLL.DTOs.Member;
+using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.DAL.Models;
 using GymManagement_MVC_Project.DAL.Models.Enums;
 using GymManagement_MVC_Project.DAL.Repositories.Contracts;
@@ -8,11 +8,11 @@ namespace GymManagement_MVC_Project.BLL.Services;
 
 public class MemberService(IMemberRepository memberRepo) : IMemberService
 {
-    public async Task<IReadOnlyList<MemberIndexViewModel>> GetAllAsync(CancellationToken ct)
+    public async Task<IReadOnlyList<MemberIndexDto>> GetAllAsync(CancellationToken ct)
     {
         var members = await memberRepo.GetAllAsync(ct);
 
-        return [.. members.Select(m => new MemberIndexViewModel
+        return [.. members.Select(m => new MemberIndexDto
         {
             Id = m.Id,
             Name = m.Name,
@@ -23,40 +23,40 @@ public class MemberService(IMemberRepository memberRepo) : IMemberService
         })];
     }
 
-    public async Task<bool> CreateAsync(MemberCreateViewModel createViewModel, CancellationToken ct = default)
+    public async Task<bool> CreateAsync(MemberCreateDto createDto, CancellationToken ct = default)
     {
-        var email = createViewModel.Email.Trim().ToLower();
+        var email = createDto.Email.Trim().ToLower();
         if (await memberRepo.IsEmailExistAsync(email, ct))
             return false;
 
-        var phone = createViewModel.Phone.Trim().ToLower();
-        if (await memberRepo.IsPhoneExistAsync(createViewModel.Phone, ct))
+        var phone = createDto.Phone.Trim().ToLower();
+        if (await memberRepo.IsPhoneExistAsync(createDto.Phone, ct))
             return false;
 
-        if (!Enum.TryParse(createViewModel.Gender, true, out GenderTypes gender))
+        if (!Enum.TryParse(createDto.Gender, true, out GenderTypes gender))
             return false;
 
-        if (!Enum.TryParse(createViewModel.HealthRecord.BloodType, true, out BloodTypes bloodType))
+        if (!Enum.TryParse(createDto.HealthRecord.BloodType, true, out BloodTypes bloodType))
             return false;
 
         var member = new Member
         {
-            Name = createViewModel.Name,
+            Name = createDto.Name,
             Email = email,
             Phone = phone,
-            DateOfBirth = createViewModel.DateOfBirth,
+            DateOfBirth = createDto.DateOfBirth,
             Gender = gender,
             Address = new Address
             {
-                City = createViewModel.City,
-                Street = createViewModel.Street,
-                BuildingNumber = createViewModel.BuildingNumber,
+                City = createDto.City,
+                Street = createDto.Street,
+                BuildingNumber = createDto.BuildingNumber,
             },
             HealthRecord = new HealthRecord
             {
-                Height = createViewModel.HealthRecord.Height,
-                Weight = createViewModel.HealthRecord.Weight,
-                Note = createViewModel.HealthRecord.Note,
+                Height = createDto.HealthRecord.Height,
+                Weight = createDto.HealthRecord.Weight,
+                Note = createDto.HealthRecord.Note,
                 BloodType = bloodType
             },
             JoinDate = DateOnly.FromDateTime(DateTime.UtcNow)

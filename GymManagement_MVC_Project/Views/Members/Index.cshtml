@@ -1,4 +1,4 @@
-﻿@model ICollection<MemberIndexViewModel>
+﻿@model IEnumerable<MemberIndexViewModel>
 
 @{
 	ViewData["Title"] = "Members";
@@ -6,24 +6,7 @@
 
 <div class="container pt-5">
 	<main role="main" class="pb-3 pt-3">
-		@* Alert Messages *@
-		@if (TempData["SuccessMessage"]?.ToString() == "Success")
-		{
-			<div id="Alert" class="alert alert-success alert-dismissible fade show">
-				<i class="bi bi-check-circle-fill me-2"></i>
-				Member Created Successfully
-				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-			</div>
-		}
-
-		@if (TempData["FailMessage"]?.ToString() == "Failed")
-		{
-			<div id="Alert" class="alert alert-danger alert-dismissible fade show">
-				<i class="bi bi-exclamation-triangle-fill me-2"></i>
-				Member Failed To Create
-				<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
-			</div>
-		}
+		<partial name="_TempDataAlertMessage" />
 
 		<div class="container">
 

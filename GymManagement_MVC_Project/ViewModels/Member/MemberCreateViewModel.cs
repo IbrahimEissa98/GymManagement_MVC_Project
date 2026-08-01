@@ -1,9 +1,8 @@
 ﻿using GymManagement_MVC_Project.DAL.Models.Enums;
 using GymManagement_MVC_Project.DAL.Models.ValidationAttributes;
 using System.ComponentModel.DataAnnotations;
-using System.Reflection;
 
-namespace GymManagement_MVC_Project.BLL.ViewModels.Member;
+namespace GymManagement_MVC_Project.PL.ViewModels.Member;
 
 public class MemberCreateViewModel
 {
@@ -28,6 +27,7 @@ public class MemberCreateViewModel
     public DateOnly DateOfBirth { get; set; }
 
     [Required(ErrorMessage = "Gender is required")]
+    [EnumDataType(typeof(GenderTypes), ErrorMessage = "Invalid gender type")]
     public string Gender { get; set; } = default!;
 
     [Required(ErrorMessage = "Building Number Is Required")]

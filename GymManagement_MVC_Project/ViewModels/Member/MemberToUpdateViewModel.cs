@@ -1,6 +1,6 @@
 ﻿using System.ComponentModel.DataAnnotations;
 
-namespace GymManagement_MVC_Project.BLL.ViewModels.Member;
+namespace GymManagement_MVC_Project.PL.ViewModels.Member;
 
 public class MemberToUpdateViewModel
 {
