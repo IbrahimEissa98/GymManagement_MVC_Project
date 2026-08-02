@@ -1,4 +1,6 @@
-﻿namespace GymManagement_MVC_Project.BLL.DTOs.Member;
+﻿using GymManagement_MVC_Project.BLL.DTOs.HealthRecord;
+
+namespace GymManagement_MVC_Project.BLL.DTOs.Member;
 
 public class MemberCreateDto
 {
@@ -10,5 +12,5 @@ public class MemberCreateDto
     public string BuildingNumber { get; set; } = default!;
     public string City { get; set; } = default!;
     public string Street { get; set; } = default!;
-    public HealthRecordDto HealthRecord { get; set; } = default!;
+    public HealthRecordCreateDto HealthRecord { get; set; } = default!;
 }

@@ -55,7 +55,7 @@
 									<td><span>@member.Phone</span></td>
 									<td class="action position-relative">
 										<div class="dropdown">
-											<button class="btn btn-link p-0 border-0" type="button"
+											<button class="btn btn-link p-2 border-0 fs-5" type="button"
 													id="dropdownMenuButton-@member.Id" data-bs-toggle="dropdown"
 													aria-expanded="false">
 												<i class="bi bi-three-dots"></i>
@@ -66,11 +66,11 @@
 													<a asp-controller="Members" asp-action="Details" asp-route-id="@member.Id"
 													   class="dropdown-item d-flex align-items-center gap-3">
 														<i class="bi bi-exclamation-circle text-warning"></i>
-														<span>View Member Data</span>
+														<span>View Data</span>
 													</a>
 												</li>
 												<li>
-													<a asp-controller="Members" asp-action="HealthRecord" asp-route-id="@member.Id"
+													<a asp-controller="Members" asp-action="HealthDetails" asp-route-id="@member.Id"
 													   class="dropdown-item d-flex align-items-center gap-3">
 														<i class="bi bi-exclamation-circle text-warning"></i>
 														<span>View Health Record Data</span>
@@ -83,7 +83,7 @@
 													<a asp-controller="Members" asp-action="Edit" asp-route-id="@member.Id"
 													   class="dropdown-item d-flex align-items-center gap-3">
 														<i class="bi bi-pencil-square text-success"></i>
-														<span>Edit Member Data</span>
+														<span>Edit Data</span>
 													</a>
 												</li>
 												<li>

@@ -1,5 +1,6 @@
 ﻿using GymManagement_MVC_Project.DAL.Models.Enums;
 using GymManagement_MVC_Project.DAL.Models.ValidationAttributes;
+using GymManagement_MVC_Project.PL.ViewModels.HealthRecord;
 using System.ComponentModel.DataAnnotations;
 
 namespace GymManagement_MVC_Project.PL.ViewModels.Member;
@@ -45,5 +46,5 @@ public class MemberCreateViewModel
     public string Street { get; set; } = default!;
 
     [Required(ErrorMessage = "Health record is required")]
-    public HealthRecordViewModel HealthRecord { get; set; } = default!;
+    public HealthRecordCreateViewModel HealthRecord { get; set; } = default!;
 }

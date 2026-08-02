@@ -24,6 +24,18 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
     public async Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default)
         => await _dbSet.FirstOrDefaultAsync(t => t.Id == id, ct);
 
+    public async Task<TEntity?> GetByIdWithIncludesAsync(int id, CancellationToken ct = default,
+                                            params Expression<Func<TEntity, object>>[] includes)
+    {
+        var query = _dbSet.AsQueryable();
+        foreach (var include in includes)
+        {
+            query = query.Include(include);
+        }
+
+        return await query.FirstOrDefaultAsync(t => t.Id == id, ct);
+    }
+
     public async Task<TEntity?> GetByIdIncludingDeletedAsync(int id, CancellationToken ct = default)
         => await _dbSet.IgnoreQueryFilters().FirstOrDefaultAsync(t => t.Id == id, ct);
 

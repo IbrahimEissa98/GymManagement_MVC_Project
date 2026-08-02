@@ -1,4 +1,6 @@
-﻿using GymManagement_MVC_Project.BLL.DTOs.Member;
+﻿using GymManagement_MVC_Project.BLL.DTOs.HealthRecord;
+using GymManagement_MVC_Project.BLL.DTOs.Member;
+using GymManagement_MVC_Project.BLL.Extensions;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.DAL.Models;
 using GymManagement_MVC_Project.DAL.Models.Enums;
@@ -69,5 +71,52 @@ public class MemberService(IMemberRepository memberRepo) : IMemberService
         if (result == 0) return false;
 
         return true;
+    }
+
+    public async Task<MemberDetailsDto?> GetDetailsAsync(int id, CancellationToken ct = default)
+    {
+        var member = await memberRepo.GetByIdWithMembershipAsync(id, ct);
+
+        if (member is null) return null;
+
+        var membership = member.Memberships?.Where(m => m.EndDate > DateTime.UtcNow)?.FirstOrDefault();
+
+        var address = string.Join(" - ", member.Address.BuildingNumber, member.Address.Street, member.Address.City);
+
+        var memberDto = new MemberDetailsDto
+        {
+            Id = member.Id,
+            PhotoUrl = member.Photo,
+            Name = member.Name,
+            Email = member.Email,
+            Phone = member.Phone,
+            Gender = member.Gender.ToString(),
+            DateOfBirth = member.DateOfBirth.ToString("dd/MM/yyyy"),
+            Address = address,
+            MembershipStartDate = membership?.StartDate.ToString("dd/MM/yyyy"),
+            MembershipEndDate = membership?.EndDate.ToString("dd/MM/yyyy"),
+            PlanName = membership?.Plan.Name
+        };
+
+        return memberDto;
+    }
+
+    public async Task<HealthRecordDetailsDto?> GetHealthRecordAsync(int id, CancellationToken ct = default)
+    {
+        var member = await memberRepo.GetByIdWithIncludesAsync(id, ct, m => m.HealthRecord);
+
+        if(member is null) return null;
+
+        var healthDto = new HealthRecordDetailsDto
+        {
+            PhotoUrl = member.Photo,
+            Name = member.Name,
+            Height = (int)member.HealthRecord.Height,
+            Weight = (int)member.HealthRecord.Weight,
+            BloodType = member.HealthRecord.BloodType.GetDisplayName(),
+            Note = member.HealthRecord.Note
+        };
+
+        return healthDto;
     }
 }

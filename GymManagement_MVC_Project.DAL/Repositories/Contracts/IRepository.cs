@@ -7,6 +7,8 @@ public interface IRepository<TEntity> where TEntity : BaseEntity
 {
     Task<IReadOnlyList<TEntity>> GetAllAsync(CancellationToken ct = default);
     Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default);
+    Task<TEntity?> GetByIdWithIncludesAsync(int id, CancellationToken ct = default,
+                                            params Expression<Func<TEntity, object>>[] includes );
     Task<TEntity?> GetByIdIncludingDeletedAsync(int id, CancellationToken ct = default);
     Task<IReadOnlyList<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, CancellationToken ct = default);
     Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> expression, CancellationToken ct = default);

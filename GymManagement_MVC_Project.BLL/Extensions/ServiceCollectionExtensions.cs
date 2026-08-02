@@ -8,7 +8,7 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace GymManagement_MVC_Project.DAL
+namespace GymManagement_MVC_Project.BLL.Extentions
 {
     public static class ServiceCollectionExtensions
     {

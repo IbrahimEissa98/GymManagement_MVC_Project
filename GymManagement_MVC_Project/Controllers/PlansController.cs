@@ -17,14 +17,14 @@ public class PlansController(IPlanRepository planRepo) : Controller
     //[HttpGet("{id}")]
     public async Task<IActionResult> Details(int id)
     {
-        if(id <= 0)
-        {
-            return NotFound();
-        }
+        //if(id <= 0)
+        //{
+        //    return NotFound();
+        //}
         var plan = await planRepo.GetByIdAsync(id);
 
         if (plan is null)
-            return RedirectToAction(nameof(Index));
+            return NotFound();
         
         return View(plan);
     }

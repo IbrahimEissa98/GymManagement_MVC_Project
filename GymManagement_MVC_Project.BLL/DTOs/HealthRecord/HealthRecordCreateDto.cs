@@ -1,6 +1,6 @@
-﻿namespace GymManagement_MVC_Project.BLL.DTOs.Member;
+﻿namespace GymManagement_MVC_Project.BLL.DTOs.HealthRecord;
 
-public class HealthRecordDto
+public class HealthRecordCreateDto
 {
     public int Height { get; set; }
     public int Weight { get; set; }

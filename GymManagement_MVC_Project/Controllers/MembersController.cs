@@ -1,5 +1,7 @@
-﻿using GymManagement_MVC_Project.BLL.DTOs.Member;
+﻿using GymManagement_MVC_Project.BLL.DTOs.HealthRecord;
+using GymManagement_MVC_Project.BLL.DTOs.Member;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
+using GymManagement_MVC_Project.PL.ViewModels.HealthRecord;
 using GymManagement_MVC_Project.PL.ViewModels.Member;
 using Microsoft.AspNetCore.Mvc;
 
@@ -46,7 +48,7 @@ public class MembersController(IMemberService memberService) : Controller
             BuildingNumber = model.BuildingNumber,
             Street = model.Street,
             City = model.City,
-            HealthRecord = new HealthRecordDto
+            HealthRecord = new HealthRecordCreateDto
             {
                 Height = model.HealthRecord.Height,
                 Weight = model.HealthRecord.Weight,
@@ -63,5 +65,48 @@ public class MembersController(IMemberService memberService) : Controller
             TempData["FailMessage"] = "Failed To Create Member";
 
         return RedirectToAction(nameof(Index));
+    }
+
+    public async Task<IActionResult> Details(int id, CancellationToken ct)
+    {
+        var memberDto = await memberService.GetDetailsAsync(id, ct);
+
+        if (memberDto is null) return NotFound();
+
+        var memberViewModel = new MemberDetailsViewModel
+        {
+            Id = memberDto.Id,
+            PhotoUrl = memberDto.PhotoUrl,
+            Name = memberDto.Name,
+            Email = memberDto.Email,
+            Phone = memberDto.Phone,
+            Gender = memberDto.Gender.ToString(),
+            DateOfBirth = memberDto.DateOfBirth,
+            Address = memberDto.Address,
+            MembershipStartDate = memberDto.MembershipStartDate,
+            MembershipEndDate = memberDto.MembershipEndDate,
+            PlanName = memberDto.PlanName
+        };
+
+        return View(memberViewModel);
+    }
+
+    public async Task<IActionResult> HealthDetails(int id, CancellationToken ct)
+    {
+        var healthDto = await memberService.GetHealthRecordAsync(id, ct);
+
+        if (healthDto is null) return NotFound();
+
+        var healthViewModel = new HealthRecordDetailsViewModel
+        {
+            PhotoUrl = healthDto.PhotoUrl,
+            Name = healthDto.Name,
+            Height = healthDto.Height,
+            Weight = healthDto.Weight,
+            BloodType = healthDto.BloodType,
+            Note = healthDto.Note
+        };
+
+        return View(healthViewModel);
     }
 }

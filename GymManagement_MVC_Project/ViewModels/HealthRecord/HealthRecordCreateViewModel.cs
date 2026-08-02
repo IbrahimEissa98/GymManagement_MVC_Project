@@ -1,9 +1,9 @@
 ﻿using GymManagement_MVC_Project.DAL.Models.Enums;
 using System.ComponentModel.DataAnnotations;
 
-namespace GymManagement_MVC_Project.PL.ViewModels.Member;
+namespace GymManagement_MVC_Project.PL.ViewModels.HealthRecord;
 
-public class HealthRecordViewModel
+public class HealthRecordCreateViewModel
 {
     [Range(0.1, 300, ErrorMessage = "Height must be greater than 0")]
     public int Height { get; set; }
