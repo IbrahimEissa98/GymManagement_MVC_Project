@@ -10,12 +10,13 @@ internal class TrainerConfig : GymUserConfig<Trainer>
     {
         base.Configure(builder);
 
-        //builder.Property(u => u.CreatedAt)
-        //        .HasColumnName("HireDate");
-
         builder.Property(t => t.Specialties)
                 .HasColumnType("VarChar")
                 .HasConversion<string>()
                 .HasMaxLength(20);
+
+        builder.HasMany(t => t.Sessions)
+                .WithOne(s => s.Trainer)
+                .OnDelete(DeleteBehavior.ClientCascade);
     }
 }

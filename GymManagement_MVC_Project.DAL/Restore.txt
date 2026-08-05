@@ -1,0 +1,13 @@
+public async Task RestoreProductAsync(int id)
+{
+    var product = await context.Products
+        .IgnoreQueryFilters()
+        .FirstOrDefaultAsync(p => p.Id == id);
+
+    if (product != null)
+    {
+        product.IsDeleted = false;
+        product.DeletedOnUtc = null;
+        await context.SaveChangesAsync();
+    }
+}   

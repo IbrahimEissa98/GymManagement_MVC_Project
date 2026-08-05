@@ -1,0 +1,97 @@
+﻿@model MemberDeleteViewModel
+
+@{
+    ViewData["Title"] = "Delete Member";
+}
+
+
+<div class="container pt-5">
+
+    <nav class="breadcrumb-nav mb-3 pt-5" aria-label="Breadcrumb">
+        <a asp-controller="Members" asp-action="Index">
+            <i class="bi bi-people me-1"></i>Members
+        </a>
+        <span class="separator">/</span>
+        <span class="text-muted">Deactivate Member</span>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-6 col-md-8">
+
+            <div class="card plan-detail-card border-0">
+
+                <div class="card-header text-center text-white inactive">
+                    <i class="bi bi-person-x display-4 mb-3 d-block"></i>
+
+                    <h2 class="fw-bold mb-2">
+                        Deactivate Member
+                    </h2>
+
+                    <span class="badge bg-warning text-dark fs-6">
+                        Soft Delete
+                    </span>
+                </div>
+
+                <div class="card-body">
+
+                    <div class="detail-item">
+
+                        <div class="d-flex align-items-start">
+
+                            <div class="icon-box me-3">
+                                <i class="bi bi-exclamation-triangle-fill text-warning fs-4"></i>
+                            </div>
+
+                            <div>
+                                <h6 class="mb-2 text-uppercase small fw-semibold">
+                                    Confirmation
+                                </h6>
+
+                                <p class="mb-0">
+                                    Are you sure you want to deactivate
+                                    <strong>@Model.Name</strong>?
+                                </p>
+
+                                <p class="text-muted mb-0 mt-2">
+                                    The member will become inactive and will no longer appear in active member lists.
+                                    Their information will be preserved and can be restored later if needed.
+                                </p>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <div class="card-footer">
+
+                    <div class="d-flex gap-2">
+
+                        <a asp-action="Index"
+                           class="btn btn-outline flex-fill">
+                            <i class="bi bi-arrow-left me-1"></i>
+                            Cancel
+                        </a>
+
+                        <form asp-action="Delete" method="post" class="flex-fill">
+
+                            <button type="submit"
+									class="btn btn-danger rounded-pill w-100 h-100">
+                                <i class="bi bi-person-x me-1"></i>
+                                Deactivate Member
+                            </button>
+
+                        </form>
+
+                    </div>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>

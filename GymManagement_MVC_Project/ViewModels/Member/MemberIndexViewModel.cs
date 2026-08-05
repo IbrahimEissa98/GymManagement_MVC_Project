@@ -8,6 +8,7 @@ public class MemberIndexViewModel
     public string Email { get; set; } = default!;
     public string Phone { get; set; } = default!;
     public string Gender { get; set; } = default!;
+    public bool IsDeleted { get; set; }
 }
 
 

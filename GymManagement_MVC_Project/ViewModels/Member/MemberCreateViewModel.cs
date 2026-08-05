@@ -12,13 +12,13 @@ public class MemberCreateViewModel
     public string Name { get; set; } = default!;
 
     [Required(ErrorMessage = "Email Is Required")]
-    [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email address.")]
+    [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format")]
     [DataType(DataType.EmailAddress)]
     public string Email { get; set; } = default!;
 
     [Required(ErrorMessage = "Phone Number Is Required")]
     [Phone(ErrorMessage = "Invalid phone number")]
-    [RegularExpression(@"^(010|011|012|015)\d{8}$", ErrorMessage = "Phone number must be a valid Egyptian mobile number")]
+    [RegularExpression(@"^(010|011|012|015)\d{8}$", ErrorMessage = "Invalid Egyptian mobile number")]
     [DataType(DataType.PhoneNumber)]
     public string Phone { get; set; } = default!;
 

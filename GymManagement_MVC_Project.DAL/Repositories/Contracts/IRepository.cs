@@ -6,8 +6,11 @@ namespace GymManagement_MVC_Project.DAL.Repositories.Contracts;
 public interface IRepository<TEntity> where TEntity : BaseEntity
 {
     Task<IReadOnlyList<TEntity>> GetAllAsync(CancellationToken ct = default);
+    Task<IReadOnlyList<TEntity>> GetAllIncludingDeletedAsync(CancellationToken ct = default);
     Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default);
-    Task<TEntity?> GetByIdWithIncludesAsync(int id, CancellationToken ct = default,
+    Task<TEntity?> GetByIdWithIncludesAsync(int id,
+                                            bool includeDeleted = false, 
+                                            CancellationToken ct = default,
                                             params Expression<Func<TEntity, object>>[] includes );
     Task<TEntity?> GetByIdIncludingDeletedAsync(int id, CancellationToken ct = default);
     Task<IReadOnlyList<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, CancellationToken ct = default);

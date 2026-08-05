@@ -10,7 +10,16 @@ internal class MemberConfig : GymUserConfig<Member>
     {
         base.Configure(builder);
 
-        //builder.Property(u => u.CreatedAt)
-        //        .HasColumnName("JoinDate");
+        builder.HasMany(m => m.Bookings)
+                .WithOne(b => b.Member)
+                .OnDelete(DeleteBehavior.ClientCascade);
+
+        builder.HasMany(m => m.Memberships)
+                .WithOne(ms => ms.Member)
+                .OnDelete(DeleteBehavior.ClientCascade);
+
+        builder.HasOne(m => m.HealthRecord)
+                .WithOne(hr => hr.Member)
+                .OnDelete(DeleteBehavior.ClientCascade);
     }
 }

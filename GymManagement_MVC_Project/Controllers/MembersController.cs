@@ -9,6 +9,7 @@ namespace GymManagement_MVC_Project.PL.Controllers;
 
 public class MembersController(IMemberService memberService) : Controller
 {
+    [HttpGet]
     public async Task<IActionResult> Index(CancellationToken ct)
     {
         var members = await memberService.GetAllAsync(ct);
@@ -21,11 +22,13 @@ public class MembersController(IMemberService memberService) : Controller
             Email = m.Email,
             Phone = m.Phone,
             Gender = m.Gender,
+            IsDeleted = m.IsDeleted
         });
 
         return View(membersViewModel);
     }
 
+    [HttpGet]
     public IActionResult Create()
     {
         return View();
@@ -67,6 +70,7 @@ public class MembersController(IMemberService memberService) : Controller
         return RedirectToAction(nameof(Index));
     }
 
+    [HttpGet]
     public async Task<IActionResult> Details(int id, CancellationToken ct)
     {
         var memberDto = await memberService.GetDetailsAsync(id, ct);
@@ -91,6 +95,7 @@ public class MembersController(IMemberService memberService) : Controller
         return View(memberViewModel);
     }
 
+    [HttpGet]
     public async Task<IActionResult> HealthDetails(int id, CancellationToken ct)
     {
         var healthDto = await memberService.GetHealthRecordAsync(id, ct);
@@ -108,5 +113,115 @@ public class MembersController(IMemberService memberService) : Controller
         };
 
         return View(healthViewModel);
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Edit(int id, CancellationToken ct)
+    {
+        var updateDto = await memberService.GetForUpdateAsync(id, ct);
+
+        if (updateDto is null) return NotFound();
+
+        var updateViewModel = new MemberToUpdateViewModel
+        {
+            Name = updateDto.Name,
+            PhotoUrl = updateDto.PhotoUrl,
+            Email = updateDto.Email,
+            Phone = updateDto.Phone,
+            BuildingNumber = updateDto.BuildingNumber,
+            Street = updateDto.Street,
+            City = updateDto.City
+        };
+
+        return View(updateViewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    public async Task<IActionResult> Edit([FromRoute]int id, MemberToUpdateViewModel updatedModel, CancellationToken ct)
+    {
+        if (!ModelState.IsValid) return View(updatedModel);
+
+        var updatedDto = new MemberToUpdateDto
+        {
+            Name = updatedModel.Name,
+            PhotoUrl = updatedModel.PhotoUrl,
+            Email = updatedModel.Email,
+            Phone = updatedModel.Phone,
+            BuildingNumber = updatedModel.BuildingNumber,
+            Street = updatedModel.Street,
+            City = updatedModel.City
+        };
+
+        var result = await memberService.UpdateAsync(id, updatedDto, ct);
+
+        if (result)
+            TempData["SuccessMessage"] = "Member Updated Successfully";
+        else
+            TempData["FailMessage"] = "Failed To Update Member";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Delete([FromRoute]int id, CancellationToken ct)
+    {
+        var member = await memberService.GetForUpdateAsync(id, ct);
+
+        if (member is null) return NotFound();
+
+        var deleteViewModel = new MemberDeleteViewModel
+        {
+            Id = id,
+            Name = member.Name
+        };
+
+        return View(deleteViewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [ActionName("Delete")]
+    public async Task<IActionResult> DeleteConfirm([FromRoute] int id, CancellationToken ct)
+    {
+        var result = await memberService.DeleteAsync(id, ct);
+
+        if (result)
+            TempData["SuccessMessage"] = "Member Deactivated Successfully";
+        else
+            TempData["FailMessage"] = "Failed To Deactivate Member";
+
+        return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Activate([FromRoute]int id, CancellationToken ct)
+    {
+        var member = await memberService.GetForActivateAsync(id, ct);
+
+        if (member is null) return NotFound();
+
+        var activateViewModel = new MemberDeleteViewModel
+        {
+            Id = id,
+            Name = member.Name
+        };
+
+        return View(activateViewModel);
+    }
+
+    [HttpPost]
+    [ValidateAntiForgeryToken]
+    [ActionName("Activate")]
+    public async Task<IActionResult> ActivateConfirm([FromRoute] int id, CancellationToken ct)
+    {
+        var result = await memberService.ActivateAsync(id, ct);
+
+        if (result)
+            TempData["SuccessMessage"] = "Member Activated Successfully";
+        else
+            TempData["FailMessage"] = "Failed To Activate Member";
+
+        return RedirectToAction(nameof(Index));
     }
 }

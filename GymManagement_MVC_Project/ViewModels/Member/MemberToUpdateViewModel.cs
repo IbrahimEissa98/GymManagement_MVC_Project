@@ -4,21 +4,22 @@ namespace GymManagement_MVC_Project.PL.ViewModels.Member;
 
 public class MemberToUpdateViewModel
 {
-    public string? Name { get; set; }
-    public string? Photo { get; set; }
+    public string Name { get; set; } = default!;
+    public string? PhotoUrl { get; set; }
 
     [Required(ErrorMessage = "Email Is Required")]
-    [EmailAddress(ErrorMessage = "Invalid email format")]
+    [RegularExpression(@"^[^@\s]+@[^@\s]+\.[^@\s]+$", ErrorMessage = "Invalid email format")]
+    [DataType(DataType.EmailAddress)]
     public string Email { get; set; } = default!;
 
     [Required(ErrorMessage = "Phone Number Is Required")]
     [Phone(ErrorMessage = "Invalid phone number")]
-    [RegularExpression(@"^(010|011|012|015)\d{8}$", ErrorMessage = "Phone number must be a valid Egyptian mobile number")]
+    [RegularExpression(@"^(010|011|012|015)\d{8}$", ErrorMessage = "Invalid Egyptian mobile number")]
     public string Phone { get; set; } = default!;
 
     [Required(ErrorMessage = "Building Number Is Required")]
     [Range(1, int.MaxValue, ErrorMessage = "Building Number must be greater than 0")]
-    public int BuildingNumber { get; set; }
+    public string BuildingNumber { get; set; } = default!;
 
     [Required(ErrorMessage = "City Is Required")]
     [StringLength(100, MinimumLength = 2, ErrorMessage = "City must be between 2 and 100 characters")]

@@ -42,7 +42,7 @@
 						<tbody>
 							@foreach (var member in Model)
 							{
-								<tr class="align-middle">
+								<tr class="align-middle @(member.IsDeleted ? "table-danger" : "")">
 									<td>
 										<span class="avatar">
 											<img src="@(string.IsNullOrWhiteSpace(member.PhotoUrl) ? Url.Content("~/images/User.jpg") : member.PhotoUrl)" alt="Default Avatar" class="rounded-circle"
@@ -62,40 +62,53 @@
 											</button>
 											<ul class="dropdown-menu dropdown-menu-start"
 												aria-labelledby="dropdownMenuButton-member.Id">
-												<li>
-													<a asp-controller="Members" asp-action="Details" asp-route-id="@member.Id"
-													   class="dropdown-item d-flex align-items-center gap-3">
-														<i class="bi bi-exclamation-circle text-warning"></i>
-														<span>View Data</span>
-													</a>
-												</li>
-												<li>
-													<a asp-controller="Members" asp-action="HealthDetails" asp-route-id="@member.Id"
-													   class="dropdown-item d-flex align-items-center gap-3">
-														<i class="bi bi-exclamation-circle text-warning"></i>
-														<span>View Health Record Data</span>
-													</a>
-												</li>
-												<li>
-													<hr class="dropdown-divider">
-												</li>
-												<li>
-													<a asp-controller="Members" asp-action="Edit" asp-route-id="@member.Id"
-													   class="dropdown-item d-flex align-items-center gap-3">
-														<i class="bi bi-pencil-square text-success"></i>
-														<span>Edit Data</span>
-													</a>
-												</li>
-												<li>
-													<hr class="dropdown-divider">
-												</li>
-												<li>
-													<a asp-controller="Members" asp-action="Delete" asp-route-id="@member.Id"
-													   class="dropdown-item d-flex align-items-center gap-3 text-danger">
-														<i class="bi bi-x-circle text-danger"></i>
-														<span>Delete</span>
-													</a>
-												</li>
+												@if (!member.IsDeleted)
+												{
+													<li>
+														<a asp-controller="Members" asp-action="Details" asp-route-id="@member.Id"
+														   class="dropdown-item d-flex align-items-center gap-3">
+															<i class="bi bi-exclamation-circle text-warning"></i>
+															<span>View Data</span>
+														</a>
+													</li>
+													<li>
+														<a asp-controller="Members" asp-action="HealthDetails" asp-route-id="@member.Id"
+														   class="dropdown-item d-flex align-items-center gap-3">
+															<i class="bi bi-exclamation-circle text-warning"></i>
+															<span>View Health Record Data</span>
+														</a>
+													</li>
+													<li>
+														<hr class="dropdown-divider">
+													</li>
+													<li>
+														<a asp-controller="Members" asp-action="Edit" asp-route-id="@member.Id"
+														   class="dropdown-item d-flex align-items-center gap-3">
+															<i class="bi bi-pencil-square text-success"></i>
+															<span>Edit Data</span>
+														</a>
+													</li>
+													<li>
+														<hr class="dropdown-divider">
+													</li>
+													<li>
+														<a asp-controller="Members" asp-action="Delete" asp-route-id="@member.Id"
+														   class="dropdown-item d-flex align-items-center gap-3 text-danger">
+															<i class="bi bi-x-circle text-danger"></i>
+															<span>Delete</span>
+														</a>
+													</li>
+												}
+												else
+												{
+													<li>
+														<a asp-controller="Members" asp-action="Activate" asp-route-id="@member.Id"
+														   class="dropdown-item d-flex align-items-center gap-3 text-warning">
+															<i class="bi bi-check2-circle text-warning"></i>
+															<span>Activate</span>
+														</a>
+													</li>
+												}
 											</ul>
 										</div>
 									</td>

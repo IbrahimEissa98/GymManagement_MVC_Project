@@ -1,7 +1,7 @@
 ﻿@model MemberCreateViewModel
 
 @{
-	ViewData["Title"] = "Member Create";
+	ViewData["Title"] = "Create Member";
 }
 
 @section Styles{
@@ -160,15 +160,15 @@
 			}
 		});
 	</script>
-	<script>
-		document.querySelectorAll(".form-control").forEach(input =>{
-		    if (input.classList.contains("input-validation-error")) {
-				input.classList.replace("is-valid", "is-invalid");
-				// input.classList.add("is-invalid");
-		    } else if (input.classList.contains("valid")) {
-				input.classList.remove("is-invalid");
-				input.classList.add("is-valid");
-		    }
-		})
-	</script>
+	@* <script> 
+	// 	document.querySelectorAll(".form-control").forEach(input =>{
+	// 	    if (input.classList.contains("input-validation-error")) {
+	// 			input.classList.replace("is-valid", "is-invalid");
+	// 			input.classList.add("is-invalid");
+	// 	    } else if (input.classList.contains("valid")) {
+	// 			input.classList.remove("is-invalid");
+	// 			input.classList.add("is-valid");
+	// 	    }
+	// 	})
+	// </script>*@
 }

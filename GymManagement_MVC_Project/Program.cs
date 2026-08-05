@@ -1,5 +1,4 @@
-using GymManagement_MVC_Project.BLL;
-using GymManagement_MVC_Project.BLL.Extentions;
+using GymManagement_MVC_Project.BLL.Extensions;
 using GymManagement_MVC_Project.DAL;
 using GymManagement_MVC_Project.DAL.Data.Contexts;
 using GymManagement_MVC_Project.DAL.Data.Seeder;

@@ -1,7 +1,6 @@
 ﻿using GymManagement_MVC_Project.DAL.Models;
 using GymManagement_MVC_Project.DAL.Models.Interceptors;
 using Microsoft.EntityFrameworkCore;
-using Microsoft.Extensions.Logging;
 using System.Linq.Expressions;
 
 namespace GymManagement_MVC_Project.DAL.Data.Contexts;

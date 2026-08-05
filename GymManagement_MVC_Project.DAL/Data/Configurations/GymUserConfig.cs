@@ -16,13 +16,15 @@ internal class GymUserConfig<TEntity> : IEntityTypeConfiguration<TEntity> where 
                 .HasColumnType("VarChar")
                 .HasMaxLength(100);
         builder.HasIndex(u => u.Email)
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("ISDeleted = 0");
 
         builder.Property(u => u.Phone)
                 .HasColumnType("VarChar")
                 .HasMaxLength(11);
         builder.HasIndex(u => u.Phone)
-                .IsUnique();
+                .IsUnique()
+                .HasFilter("ISDeleted = 0");
 
         builder.Property(u => u.Gender)
                 .HasColumnType("VarChar")
@@ -40,7 +42,9 @@ internal class GymUserConfig<TEntity> : IEntityTypeConfiguration<TEntity> where 
                     .HasColumnName("City")
                     .HasMaxLength(30);
             address.Property(a => a.BuildingNumber)
-                    .HasColumnName("BuildingNumber");
+                    .HasColumnType("VarChar")
+                    .HasColumnName("BuildingNumber")
+                    .HasMaxLength(30);
         });
 
         builder.ToTable(tb =>

@@ -21,13 +21,22 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
     public async Task<IReadOnlyList<TEntity>> GetAllAsync(CancellationToken ct = default)
         => await _dbSet.AsNoTracking().ToListAsync(ct);
 
+    public async Task<IReadOnlyList<TEntity>> GetAllIncludingDeletedAsync(CancellationToken ct = default)
+        => await _dbSet.AsNoTracking().IgnoreQueryFilters().OrderBy(t => t.IsDeleted).ToListAsync(ct);
+
     public async Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default)
         => await _dbSet.FirstOrDefaultAsync(t => t.Id == id, ct);
 
-    public async Task<TEntity?> GetByIdWithIncludesAsync(int id, CancellationToken ct = default,
+    public async Task<TEntity?> GetByIdWithIncludesAsync(int id, 
+                                            bool includeDeleted = false,
+                                            CancellationToken ct = default,
                                             params Expression<Func<TEntity, object>>[] includes)
     {
         var query = _dbSet.AsQueryable();
+
+        if (includeDeleted) 
+            query = query.IgnoreQueryFilters();
+
         foreach (var include in includes)
         {
             query = query.Include(include);

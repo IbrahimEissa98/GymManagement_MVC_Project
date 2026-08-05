@@ -31,4 +31,19 @@
         border-radius: 14px;
         flex-shrink: 0;
     }
+
+    .detail-item .form-control {
+        border-radius: .75rem;
+        border-color: var(--border-color);
+        transition: var(--main-duration);
+    }
+
+    .detail-item .form-control:focus {
+        border-color: var(--primary-color);
+        box-shadow: 0 0 0 .2rem var(--primary-soft);
+    }
+
+    .detail-item label {
+        margin-bottom: .75rem;
+    }
 </style>

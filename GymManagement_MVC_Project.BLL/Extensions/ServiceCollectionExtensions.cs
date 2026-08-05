@@ -8,16 +8,15 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace GymManagement_MVC_Project.BLL.Extentions
-{
-    public static class ServiceCollectionExtensions
-    {
-        public static IServiceCollection AddGymBusinessLogic(this IServiceCollection services)
-        {
-            services.AddScoped<IMemberService, MemberService>();
-            
+namespace GymManagement_MVC_Project.BLL.Extensions;
 
-            return services;
-        }
+public static class ServiceCollectionExtensions
+{
+    public static IServiceCollection AddGymBusinessLogic(this IServiceCollection services)
+    {
+        services.AddScoped<IMemberService, MemberService>();
+        
+
+        return services;
     }
 }
