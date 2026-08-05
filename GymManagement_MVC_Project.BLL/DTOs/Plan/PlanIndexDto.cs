@@ -1,12 +1,11 @@
-﻿namespace GymManagement_MVC_Project.DAL.Models;
+﻿namespace GymManagement_MVC_Project.BLL.DTOs.Plan;
 
-public class Plan : BaseEntity
+public class PlanIndexDto
 {
+    public int Id { get; set; }
     public string Name { get; set; } = default!;
     public string Description { get; set; } = default!;
     public int DurationDays { get; set; }
     public decimal Price { get; set; }
     public bool IsActive { get; set; }
-
-    public ICollection<Membership> Memberships { get; set; } = [];
 }

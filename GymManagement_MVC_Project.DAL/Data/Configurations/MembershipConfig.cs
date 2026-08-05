@@ -10,7 +10,7 @@ internal class MembershipConfig : IEntityTypeConfiguration<Membership>
     {
         builder.ToTable(t =>
         {
-            t.HasCheckConstraint("CK_Membership_StartDate", "StartDate > GetDate()");
+            t.HasCheckConstraint("CK_Membership_StartDate", "StartDate >= GetDate()");
             t.HasCheckConstraint("CK_Membership_EndDate", "EndDate > StartDate");
         });
 

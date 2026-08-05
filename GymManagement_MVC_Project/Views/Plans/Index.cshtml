@@ -1,106 +1,111 @@
-﻿@model ICollection<Plan>
+﻿@model IEnumerable<PlanIndexViewModel>
 @{
 	ViewData["Title"] = "Plans";
 }
+
 <div class="container pt-5">
-	<header class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mt-5">
-		<div class="d-flex align-items-center gap-3">
-			<div class="page-icon">
-				<i class="bi bi-card-checklist"></i>
+	<main role="main" class="pb-3 pt-3">
+		<partial name="_TempDataAlertMessage" />
+
+		<header class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mt-3">
+			<div class="d-flex align-items-center gap-3">
+				<div class="page-icon">
+					<i class="bi bi-card-checklist"></i>
+				</div>
+				<div>
+					<h2 class="text-primary-color mb-1 fw-bold">Plans</h2>
+					<p class="text-muted mb-0">Manage your gym plan packages</p>
+				</div>
 			</div>
-			<div>
-				<h2 class="text-primary-color mb-1 fw-bold">Plans</h2>
-				<p class="text-muted mb-0">Manage your gym plan packages</p>
-			</div>
-		</div>
-		<a href="#" class="btn get-started btn-sm">
-			<i class="bi bi-plus-lg me-1"></i>Add New Plan
-		</a>
-	</header>
+		</header>
 
-	@if (Model.Any())
-	{
-		<div class="row g-4">
-			@foreach (var plan in Model)
-			{
-				<div class="col-12 col-md-6 col-lg-4">
-					<div class="card h-100 shadow-sm plan-card ">
-						<div class="card-header text-white text-center py-4 @(plan.IsActive ? "bg-primary" : "bg-danger inactive")">
-							<div class="d-flex align-items-center justify-content-center gap-2 ">
-								<i class="bi bi-award fs-4"></i>
-								<h4 class="mb-0">@plan.Name</h4>
-							</div>
-							@if (plan.IsActive)
-							{
-								<span class="badge bg-success mt-2">Active</span>
-							}
-							else
-							{
-								<span class="badge bg-danger mt-2">Inactive</span>
-							}
-						</div>
-
-						<div class="card-body d-flex flex-column">
-							<div class="price-block text-center">
-								<div class="display-4 fw-bold text-primary-color lh-1">@((int)plan.Price)</div>
-								<small class="text-muted fw-semibold">EGP</small>
+		@if (Model.Any())
+		{
+			<div class="row g-4">
+				@foreach (var plan in Model)
+				{
+					<div class="col-12 col-md-6 col-lg-4">
+						<div class="card h-100 shadow-sm plan-card ">
+							<div class="card-header text-white text-center py-4 @(plan.IsActive ? "bg-primary" : "bg-danger inactive")">
+								<div class="d-flex align-items-center justify-content-center gap-2 ">
+									<i class="bi bi-award fs-4"></i>
+									<h4 class="mb-0">@plan.Name</h4>
+								</div>
+								@if (plan.IsActive)
+								{
+									<span class="badge bg-success mt-2">Active</span>
+								}
+								else
+								{
+									<span class="badge bg-danger mt-2">Inactive</span>
+								}
 							</div>
 
-							<div class="plan-meta mb-3">
-								<p>
-									<i class="bi bi-calendar-check text-primary-color me-2"></i>
-									<strong>Duration:</strong> @plan.DurationDays days
-								</p>
-								<p class="mb-2">
-									<i class="bi bi-file-text text-primary-color me-2"></i>
-									<strong>Description:</strong>
-								</p>
-								<p class="small mb-0 ps-4">@plan.Description</p>
-							</div>
+							<div class="card-body d-flex flex-column">
+								<div class="price-block text-center">
+									<div class="display-4 fw-bold text-primary-color lh-1">@((int)plan.Price)</div>
+									<small class="text-muted fw-semibold">EGP</small>
+								</div>
 
-							<div class="mt-auto">
-								<div class="d-grid gap-2">
-									<a asp-controller="Plans" asp-action="Details" asp-route-id="@plan.Id" class="btn btn-outline btn-sm">
-										<i class="bi bi-eye me-1"></i>View Details
-									</a>
+								<div class="plan-meta mb-3">
+									<p>
+										<i class="bi bi-calendar-check text-primary-color me-2"></i>
+										<strong>Duration:</strong> @plan.DurationDays days
+									</p>
+									<p class="mb-2">
+										<i class="bi bi-file-text text-primary-color me-2"></i>
+										<strong>Description:</strong>
+									</p>
+									<p class="small mb-0 ps-4">@plan.Description</p>
+								</div>
 
-									<div class="d-flex gap-2">
-										<a asp-controller="Plans" asp-action="Edit" asp-route-id="@plan.Id" class="btn btn-outline btn-sm flex-fill">
-											<i class="bi bi-pencil me-1"></i>Edit
+								<div class="mt-auto">
+									<div class="d-grid gap-2">
+										<a asp-controller="Plans" asp-action="Details" asp-route-id="@plan.Id" class="btn btn-outline btn-sm">
+											<i class="bi bi-eye me-1"></i>View Details
 										</a>
-										<form asp-controller="Plans" asp-action="Activate" asp-route-id="@plan.Id" method="post" class="flex-fill">
-											<button type="submit" class="btn btn-outline btn-sm @(plan.IsActive ? "btn-outline-danger" : "btn-outline-success") w-100">
-												@if (plan.IsActive)
-												{
-													<i class="bi bi-x-circle me-1"></i>
-													<span>Deactivate</span>
-												}
-												else
-												{
-													<i class="bi bi-check-circle me-1"></i>
-													<span>Activate</span>
-												}
-											</button>
-										</form>
+
+										<div class="d-flex gap-2">
+											<a asp-controller="Plans" asp-action="Edit" asp-route-id="@plan.Id" class="btn btn-outline btn-sm flex-fill">
+												<i class="bi bi-pencil me-1"></i>Edit
+											</a>
+											<form asp-controller="Plans" asp-action="ToggleActivate" asp-route-id="@plan.Id" method="post" class="flex-fill">
+												<button type="submit" class="btn btn-outline btn-sm @(plan.IsActive ? "btn-outline-danger" : "btn-outline-success") w-100">
+													@if (plan.IsActive)
+													{
+														<i class="bi bi-x-circle me-1"></i>
+														<span>Deactivate</span>
+													}
+													else
+													{
+														<i class="bi bi-check-circle me-1"></i>
+														<span>Activate</span>
+													}
+												</button>
+											</form>
+										</div>
 									</div>
 								</div>
 							</div>
 						</div>
 					</div>
-				</div>
-			}
-		</div>
-	}
-	else
-	{
-		<div class="empty-state text-center py-5 mt-4 d-none">
-			<i class="bi bi-inbox display-1"></i>
-			<h4 class="mt-3 text-muted">No Plans Available</h4>
-			<p class="text-muted mb-4">Create your first membership plan to get started.</p>
-			<a href="#" class="btn get-started btn-sm">
-				<i class="bi bi-plus-lg me-1"></i>Add New Plan
-			</a>
-		</div>
-	}
-
+				}
+			</div>
+		}
+		else
+		{
+			<div class="empty-state text-center py-5 mt-4 d-none">
+				<i class="bi bi-inbox display-1"></i>
+				<h4 class="mt-3 text-muted">No Plans Available</h4>
+				<p class="text-muted mb-4">Create your first membership plan to get started.</p>
+				<a href="#" class="btn get-started btn-sm">
+					<i class="bi bi-plus-lg me-1"></i>Add New Plan
+				</a>
+			</div>
+		}
+	</main>
 </div>
+
+@section Scripts {
+	<partial name="_AlertDismissScript" />
+}

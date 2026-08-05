@@ -1,4 +1,4 @@
-﻿@model Plan
+﻿@model PlanIndexViewModel
 @{
 	ViewData["Title"] = "Plans";
 }
@@ -6,7 +6,7 @@
 <div class="container pt-5">
 
 	<nav class="breadcrumb-nav mb-3 pt-5" aria-label="Breadcrumb">
-		<a asp-controller="Plan" asp-action="Index"><i class="bi bi-card-checklist me-1"></i>Plans</a>
+		<a asp-controller="Plans" asp-action="Index"><i class="bi bi-card-checklist me-1"></i>Plans</a>
 		<span class="separator">/</span>
 		<span class="text-muted">Plan Details</span>
 	</nav>
@@ -93,7 +93,7 @@
 						<a asp-action="Index" class="btn btn-outline flex-fill">
 							<i class="bi bi-arrow-left me-1"></i>Back to Plans
 						</a>
-						<a asp-controller="Plan" asp-action="Edit" asp-route-id="@Model.Id" class="btn get-started flex-fill">
+						<a asp-controller="Plans" asp-action="Edit" asp-route-id="@Model.Id" class="btn get-started flex-fill">
 							<i class="bi bi-pencil me-1"></i>Edit Plan
 						</a>
 					</div>

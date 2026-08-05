@@ -4,14 +4,9 @@ using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 
 namespace GymManagement_MVC_Project.DAL.Repositories;
 
-public class PlanRepository : Repository<Plan>, IPlanRepository
+public class PlanRepository(GymDbContext gymDbContext) : Repository<Plan>(gymDbContext), IPlanRepository
 {
-    private readonly GymDbContext _dbContext;
-
-    public PlanRepository(GymDbContext gymDbContext) : base(gymDbContext)
-    {
-        _dbContext = gymDbContext;
-    }
+    private readonly GymDbContext _dbContext = gymDbContext;
 
 
 }
