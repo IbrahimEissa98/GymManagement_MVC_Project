@@ -1,0 +1,175 @@
+﻿@model TrainerEditViewModel
+
+@{
+	ViewData["Title"] = "Edit Trainer";
+}
+
+@section Styles{
+    <partial name="_BootstrapValidationClassesStylePartial" />
+}
+
+<div class="container pt-5">
+
+    <nav class="breadcrumb-nav mb-3 pt-5" aria-label="Breadcrumb">
+        <a asp-controller="Trainers" asp-action="Index">
+            <i class="bi bi-person-workspace me-1"></i>Trainers
+        </a>
+        <span class="separator">/</span>
+        <span class="text-muted">Edit Trainer</span>
+    </nav>
+
+    <div class="row justify-content-center">
+
+        <div class="col-lg-10">
+
+            <div class="card plan-detail-card border-0">
+
+                <div class="card-header text-center text-white">
+                    <i class="bi bi-pencil-square display-4 mb-3 d-block"></i>
+
+                    <p class="mb-2 opacity-75">
+						Edit Trainer Profile
+                    </p>
+
+					<h2 class="fw-bold mb-0">
+						@Model.Name
+                    </h2>
+
+                </div>
+
+				<form id="updateForm" asp-action="Edit" method="post">
+
+                    <input asp-for="Name" type="hidden" />
+
+                    <div class="card-body">
+
+                        <!-- Personal Information -->
+
+                        <div class="detail-item mb-4">
+
+                            <h5 class="fw-bold text-primary-color mb-4">
+                                <i class="bi bi-person-vcard me-2"></i>
+                                Personal Information
+                            </h5>
+
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+                                    <label asp-for="Email" class="form-label fw-semibold"></label>
+                                    <input asp-for="Email" class="form-control" />
+                                    <span asp-validation-for="Email" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-6">
+                                    <label asp-for="Phone" class="form-label fw-semibold"></label>
+                                    <input asp-for="Phone" class="form-control" />
+                                    <span asp-validation-for="Phone" class="text-danger"></span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Address -->
+
+                        <div class="detail-item mb-4">
+
+                            <h5 class="fw-bold text-primary-color mb-4">
+                                <i class="bi bi-geo-alt me-2"></i>
+                                Address Information
+                            </h5>
+
+                            <div class="row g-3">
+
+                                <div class="col-md-4">
+                                    <label asp-for="BuildingNumber" class="form-label fw-semibold"></label>
+                                    <input asp-for="BuildingNumber" class="form-control" />
+                                    <span asp-validation-for="BuildingNumber" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="Street" class="form-label fw-semibold"></label>
+                                    <input asp-for="Street" class="form-control" />
+                                    <span asp-validation-for="Street" class="text-danger"></span>
+                                </div>
+
+                                <div class="col-md-4">
+                                    <label asp-for="City" class="form-label fw-semibold"></label>
+                                    <input asp-for="City" class="form-control" />
+                                    <span asp-validation-for="City" class="text-danger"></span>
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                        <!-- Professional Information -->
+
+                        <div class="detail-item">
+
+                            <h5 class="fw-bold text-primary-color mb-4">
+                                <i class="bi bi-award me-2"></i>
+                                Professional Information
+                            </h5>
+
+                            <div class="row g-3">
+
+                                <div class="col-md-6">
+                                    <label asp-for="Specialties" class="form-label fw-semibold"></label>
+
+                                    <select asp-for="Specialties"
+                                            asp-items="Html.GetEnumSelectList<TrainerSpecialties>()"
+                                            class="form-select">
+
+                                        <option disabled value="">
+                                            Select Specialization
+                                        </option>
+
+                                    </select>
+
+                                    <span asp-validation-for="Specialties"
+                                          class="text-danger"></span>
+
+                                </div>
+
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                    <div class="card-footer">
+
+                        <div class="d-flex gap-2">
+
+                            <a asp-action="Index"
+                               class="btn btn-outline flex-fill">
+                                <i class="bi bi-arrow-left me-1"></i>
+                                Back to Trainers
+                            </a>
+
+							<button type="submit" id="submitBtn"
+                                    class="btn get-started flex-fill">
+                                <i class="bi bi-check-circle me-1"></i>
+                                Update Trainer
+                            </button>
+
+                        </div>
+
+                    </div>
+
+                </form>
+
+            </div>
+
+        </div>
+
+    </div>
+
+</div>
+
+@section Scripts
+{
+    <partial name="_ValidationScriptsPartial" />
+    <partial name="_DisabledSubmitBtnScript" />
+}

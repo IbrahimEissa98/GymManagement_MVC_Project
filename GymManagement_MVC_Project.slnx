@@ -1,4 +1,7 @@
 <Solution>
+  <Folder Name="/Solution Items/">
+    <File Path=".editorconfig" />
+  </Folder>
   <Project Path="GymManagement_MVC_Project.BLL/GymManagement_MVC_Project.BLL.csproj" />
   <Project Path="GymManagement_MVC_Project.DAL/GymManagement_MVC_Project.DAL.csproj" />
   <Project Path="GymManagement_MVC_Project/GymManagement_MVC_Project.PL.csproj" />

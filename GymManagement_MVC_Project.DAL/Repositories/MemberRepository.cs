@@ -11,13 +11,12 @@ public class MemberRepository(GymDbContext gymDbContext) :
 {
     private readonly GymDbContext _gymDbContext = gymDbContext;
 
-    //private readonly GymDbContext _gymDbContext = gymDbContext;
-    public async Task<bool> IsEmailExistAsync(string email, int? includeId = null, CancellationToken ct = default)
+    public async Task<bool> IsEmailTakenAsync(string email, int? includeId = null, CancellationToken ct = default)
         => await ExistsAsync(m => m.Email == email && 
                             (!includeId.HasValue || m.Id != includeId.Value),
                             ct);
 
-    public async Task<bool> IsPhoneExistAsync(string phone, int? includeId = null, CancellationToken ct = default)
+    public async Task<bool> IsPhoneTakenAsync(string phone, int? includeId = null, CancellationToken ct = default)
         => await ExistsAsync(m => m.Phone == phone &&
                             (!includeId.HasValue || m.Id != includeId.Value), ct);
 

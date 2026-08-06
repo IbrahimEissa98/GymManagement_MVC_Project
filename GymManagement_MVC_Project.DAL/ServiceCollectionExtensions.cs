@@ -14,6 +14,7 @@ namespace GymManagement_MVC_Project.DAL
         {
             services.AddScoped<IPlanRepository, PlanRepository>();
             services.AddScoped<IMemberRepository, MemberRepository>();
+            services.AddScoped<ITrainerRepository, TrainerRepository>();
             services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
             services.AddSingleton<TimestampInterceptor>();
             services.AddDbContext<GymDbContext>((sp, options) =>

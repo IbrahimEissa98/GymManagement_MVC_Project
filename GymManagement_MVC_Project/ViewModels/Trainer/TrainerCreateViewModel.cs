@@ -1,11 +1,10 @@
 ﻿using GymManagement_MVC_Project.DAL.Models.Enums;
 using GymManagement_MVC_Project.DAL.Models.ValidationAttributes;
-using GymManagement_MVC_Project.PL.ViewModels.HealthRecord;
 using System.ComponentModel.DataAnnotations;
 
-namespace GymManagement_MVC_Project.PL.ViewModels.Member;
+namespace GymManagement_MVC_Project.PL.ViewModels.Trainer;
 
-public class MemberCreateViewModel
+public class TrainerCreateViewModel
 {
     [Required(ErrorMessage = "Name Is Required")]
     [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Name can only contain letters and spaces")]
@@ -45,6 +44,7 @@ public class MemberCreateViewModel
     [RegularExpression(@"^[a-zA-Z0-9\s]+$", ErrorMessage = "Street can only contain letters, numbers, and spaces")]
     public string Street { get; set; } = default!;
 
-    [Required(ErrorMessage = "Health record is required")]
-    public HealthRecordCreateViewModel HealthRecord { get; set; } = default!;
+    [Required(ErrorMessage = "Specialties is required")]
+    [EnumDataType(typeof(TrainerSpecialties), ErrorMessage = "Invalid Specialties type")]
+    public string Specialties { get; set; } = default!;
 }

@@ -29,11 +29,11 @@ public class MemberService(IMemberRepository memberRepo) : IMemberService
     public async Task<bool> CreateAsync(MemberCreateDto createDto, CancellationToken ct = default)
     {
         var email = createDto.Email.Trim().ToLower();
-        if (await memberRepo.IsEmailExistAsync(email, ct: ct))
+        if (await memberRepo.IsEmailTakenAsync(email, ct: ct))
             return false;
 
         var phone = createDto.Phone.Trim().ToLower();
-        if (await memberRepo.IsPhoneExistAsync(createDto.Phone, ct: ct))
+        if (await memberRepo.IsPhoneTakenAsync(createDto.Phone, ct: ct))
             return false;
 
         if (!Enum.TryParse(createDto.Gender, true, out GenderTypes gender))
@@ -151,8 +151,8 @@ public class MemberService(IMemberRepository memberRepo) : IMemberService
         var email = updateDto.Email.Trim().ToLowerInvariant();
         var phone = updateDto.Phone;
 
-        if (await memberRepo.IsEmailExistAsync(email, id, ct)) return false;
-        if (await memberRepo.IsPhoneExistAsync(phone, id, ct)) return false;
+        if (await memberRepo.IsEmailTakenAsync(email, id, ct)) return false;
+        if (await memberRepo.IsPhoneTakenAsync(phone, id, ct)) return false;
 
         member.Email = email;
         member.Phone = phone;

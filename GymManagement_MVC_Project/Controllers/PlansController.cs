@@ -1,9 +1,6 @@
 ﻿using GymManagement_MVC_Project.BLL.DTOs.Plan;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
-using GymManagement_MVC_Project.DAL.Models;
-using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 using GymManagement_MVC_Project.PL.ViewModels.Plan;
-using Microsoft.AspNetCore.Http.HttpResults;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagement_MVC_Project.PL.Controllers;

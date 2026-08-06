@@ -9,6 +9,203 @@
 }
 
 <div class="container pt-5">
+
+	<nav class="breadcrumb-nav mb-3 pt-5" aria-label="Breadcrumb">
+		<a asp-controller="Members" asp-action="Index">
+			<i class="bi bi-people me-1"></i>Members
+		</a>
+		<span class="separator">/</span>
+		<span class="text-muted">Add Member</span>
+	</nav>
+
+	<div class="row justify-content-center">
+
+		<div class="col-lg-10">
+
+			<div class="card plan-detail-card border-0">
+
+				<div class="card-header text-center text-white">
+					<i class="bi bi-person-plus display-4 mb-3 d-block"></i>
+
+					<h2 class="fw-bold mb-2">
+						Add New Member
+					</h2>
+
+					<p class="mb-0 opacity-75">
+						Enter the member information below.
+					</p>
+				</div>
+
+				<form method="post" class="needs-validation">
+
+					<div class="card-body">
+
+						<!-- Personal Information -->
+
+						<div class="detail-item mb-4">
+
+							<h5 class="fw-bold text-primary-color mb-4">
+								<i class="bi bi-person-vcard me-2"></i>
+								Personal Information
+							</h5>
+
+							<div class="row g-3">
+
+								<div class="col-md-6">
+									<label asp-for="Name" class="form-label fw-semibold"></label>
+									<input asp-for="Name" class="form-control" />
+									<span asp-validation-for="Name" class="text-danger"></span>
+								</div>
+
+								<div class="col-md-6">
+									<label asp-for="Email" class="form-label fw-semibold"></label>
+									<input asp-for="Email" class="form-control" />
+									<span asp-validation-for="Email" class="text-danger"></span>
+								</div>
+
+								<div class="col-md-6">
+									<label asp-for="Phone" class="form-label fw-semibold"></label>
+									<input asp-for="Phone" class="form-control" />
+									<span asp-validation-for="Phone" class="text-danger"></span>
+								</div>
+
+								<div class="col-md-6">
+									<label asp-for="DateOfBirth" class="form-label fw-semibold"></label>
+									<input asp-for="DateOfBirth" type="date" class="form-control" />
+									<span asp-validation-for="DateOfBirth" class="text-danger"></span>
+								</div>
+
+								<div class="col-md-6">
+									<label asp-for="Gender" class="form-label fw-semibold"></label>
+									<select asp-for="Gender"
+											asp-items="Html.GetEnumSelectList<GenderTypes>()"
+											class="form-select">
+										<option selected disabled value="">Select Gender</option>
+									</select>
+									<span asp-validation-for="Gender" class="text-danger"></span>
+								</div>
+
+							</div>
+
+						</div>
+
+						<!-- Address Information -->
+
+						<div class="detail-item mb-4">
+
+							<h5 class="fw-bold text-primary-color mb-4">
+								<i class="bi bi-geo-alt me-2"></i>
+								Address Information
+							</h5>
+
+							<div class="row g-3">
+
+								<div class="col-md-4">
+									<label asp-for="BuildingNumber" class="form-label fw-semibold"></label>
+									<input asp-for="BuildingNumber" class="form-control" />
+									<span asp-validation-for="BuildingNumber" class="text-danger"></span>
+								</div>
+
+								<div class="col-md-4">
+									<label asp-for="Street" class="form-label fw-semibold"></label>
+									<input asp-for="Street" class="form-control" />
+									<span asp-validation-for="Street" class="text-danger"></span>
+								</div>
+
+								<div class="col-md-4">
+									<label asp-for="City" class="form-label fw-semibold"></label>
+									<input asp-for="City" class="form-control" />
+									<span asp-validation-for="City" class="text-danger"></span>
+								</div>
+
+							</div>
+
+						</div>
+
+						<!-- Health Information -->
+
+						<div class="detail-item">
+
+							<h5 class="fw-bold text-primary-color mb-4">
+								<i class="bi bi-heart-pulse me-2"></i>
+								Health Information
+							</h5>
+
+							<div class="row g-3">
+
+								<div class="col-md-6">
+									<label asp-for="HealthRecord.Height" class="form-label fw-semibold"></label>
+									<input asp-for="HealthRecord.Height" class="form-control" />
+									<span asp-validation-for="HealthRecord.Height" class="text-danger"></span>
+								</div>
+
+								<div class="col-md-6">
+									<label asp-for="HealthRecord.Weight" class="form-label fw-semibold"></label>
+									<input asp-for="HealthRecord.Weight" class="form-control" />
+									<span asp-validation-for="HealthRecord.Weight" class="text-danger"></span>
+								</div>
+
+								<div class="col-md-6">
+									<label asp-for="HealthRecord.BloodType" class="form-label fw-semibold"></label>
+									<select asp-for="HealthRecord.BloodType"
+											asp-items="Html.GetEnumSelectList<BloodTypes>()"
+											class="form-select">
+										<option selected disabled value="">Select Blood Type</option>
+									</select>
+									<span asp-validation-for="HealthRecord.BloodType" class="text-danger"></span>
+								</div>
+
+								<div class="col-md-6">
+									<label asp-for="HealthRecord.Note" class="form-label fw-semibold"></label>
+									<textarea asp-for="HealthRecord.Note"
+											  rows="3"
+											  class="form-control"></textarea>
+									<span asp-validation-for="HealthRecord.Note" class="text-danger"></span>
+								</div>
+
+							</div>
+
+						</div>
+
+					</div>
+
+					<div class="card-footer">
+
+						<div class="d-flex gap-2">
+
+							<a asp-action="Index"
+							   class="btn btn-outline flex-fill">
+								<i class="bi bi-arrow-left me-1"></i>
+								Back to Members
+							</a>
+
+							<button type="submit"
+									class="btn get-started flex-fill">
+								<i class="bi bi-plus-circle me-1"></i>
+								Add Member
+							</button>
+
+						</div>
+
+					</div>
+
+				</form>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+@section Scripts
+{
+	<partial name="_ValidationScriptsPartial" />
+}
+
+
+@* <div class="container pt-5">
 	<main role="main" class="pb-3 pt-4">
 
 		<nav class="breadcrumb-nav mb-3" aria-label="Breadcrumb">
@@ -140,11 +337,9 @@
 		</form>
 
 	</main>
-</div>
+</div> *@
 
-
-@section Scripts {
-	<partial name="_ValidationScriptsPartial" />
+	@* <partial name="_ValidationScriptsPartial" />
 	<script>
 		// Preview photo before upload
 		document.getElementById('photoInput').addEventListener('change', function (e) {
@@ -159,7 +354,7 @@
 				reader.readAsDataURL(file);
 			}
 		});
-	</script>
+	</script> *@
 	@* <script> 
 	// 	document.querySelectorAll(".form-control").forEach(input =>{
 	// 	    if (input.classList.contains("input-validation-error")) {
@@ -171,4 +366,3 @@
 	// 	    }
 	// 	})
 	// </script>*@
-}
