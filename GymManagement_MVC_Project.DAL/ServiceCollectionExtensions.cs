@@ -6,26 +6,25 @@ using Microsoft.EntityFrameworkCore;
 using Microsoft.Extensions.DependencyInjection;
 using Microsoft.Extensions.Logging;
 
-namespace GymManagement_MVC_Project.DAL
+namespace GymManagement_MVC_Project.DAL;
+
+public static class ServiceCollectionExtensions
 {
-    public static class ServiceCollectionExtensions
+    public static IServiceCollection AddGymDataAccess(this IServiceCollection services, string connectionString)
     {
-        public static IServiceCollection AddGymDataAccess(this IServiceCollection services, string connectionString)
+        services.AddScoped<IUnitOfWork, UnitOfWork>();
+        services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
+
+        services.AddSingleton<TimestampInterceptor>();
+
+        services.AddDbContext<GymDbContext>((sp, options) =>
         {
-            services.AddScoped<IPlanRepository, PlanRepository>();
-            services.AddScoped<IMemberRepository, MemberRepository>();
-            services.AddScoped<ITrainerRepository, TrainerRepository>();
-            services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
-            services.AddSingleton<TimestampInterceptor>();
-            services.AddDbContext<GymDbContext>((sp, options) =>
-            {
-                options.UseSqlServer(connectionString);
-                options.LogTo(Console.WriteLine, LogLevel.Information);
+            options.UseSqlServer(connectionString);
+            options.LogTo(Console.WriteLine, LogLevel.Information);
 
-                options.AddInterceptors(sp.GetRequiredService<TimestampInterceptor>());
-            });
+            options.AddInterceptors(sp.GetRequiredService<TimestampInterceptor>());
+        });
 
-            return services;
-        }
+        return services;
     }
 }

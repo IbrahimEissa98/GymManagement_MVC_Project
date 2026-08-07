@@ -9,12 +9,14 @@ using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 namespace GymManagement_MVC_Project.BLL.Services;
 
 public class MemberService(
-    IMemberRepository memberRepo
+    IUnitOfWork unitOfWork
     ) : IMemberService
 {
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
     public async Task<IReadOnlyList<MemberIndexDto>> GetAllAsync(CancellationToken ct)
     {
-        var members = await memberRepo.GetAllIncludingDeletedAsync(ct);
+        var members = await _unitOfWork.Members.GetAllIncludingDeletedAsync(ct);
 
         return [.. members.Select(m => new MemberIndexDto
         {
@@ -31,11 +33,11 @@ public class MemberService(
     public async Task<bool> CreateAsync(MemberCreateDto createDto, CancellationToken ct = default)
     {
         var email = createDto.Email.Trim().ToLower();
-        if (await memberRepo.IsEmailTakenAsync(email, ct: ct))
+        if (await _unitOfWork.Members.IsEmailTakenAsync(email, ct: ct))
             return false;
 
         var phone = createDto.Phone.Trim().ToLower();
-        if (await memberRepo.IsPhoneTakenAsync(createDto.Phone, ct: ct))
+        if (await _unitOfWork.Members.IsPhoneTakenAsync(createDto.Phone, ct: ct))
             return false;
 
         if (!Enum.TryParse(createDto.Gender, true, out GenderTypes gender))
@@ -67,9 +69,9 @@ public class MemberService(
             JoinDate = DateOnly.FromDateTime(DateTime.UtcNow)
         };
 
-        await memberRepo.AddAsync(member, ct);
+        await _unitOfWork.Members.AddAsync(member, ct);
 
-        var result = await memberRepo.SaveChangesAsync(ct);
+        var result = await _unitOfWork.CommitAsync(ct);
 
         if (result == 0) return false;
 
@@ -78,7 +80,7 @@ public class MemberService(
 
     public async Task<MemberDetailsDto?> GetDetailsAsync(int id, CancellationToken ct = default)
     {
-        var member = await memberRepo.GetByIdWithMembershipAsync(id, ct);
+        var member = await _unitOfWork.Members.GetByIdWithMembershipAsync(id, ct);
 
         if (member is null) return null;
 
@@ -108,7 +110,7 @@ public class MemberService(
 
     public async Task<HealthRecordDetailsDto?> GetHealthRecordAsync(int id, CancellationToken ct = default)
     {
-        var member = await memberRepo.GetByIdWithIncludesAsync(id, ct: ct, includes: m => m.HealthRecord);
+        var member = await _unitOfWork.Members.GetByIdWithIncludesAsync(id, ct: ct, includes: m => m.HealthRecord);
 
         if (member is null) return null;
 
@@ -127,7 +129,7 @@ public class MemberService(
 
     public async Task<MemberToUpdateDto?> GetForUpdateAsync(int id, CancellationToken ct = default)
     {
-        var member = await memberRepo.GetByIdAsync(id, ct);
+        var member = await _unitOfWork.Members.GetByIdAsync(id, ct);
 
         if (member is null) return null;
 
@@ -147,7 +149,7 @@ public class MemberService(
 
     public async Task<bool> UpdateAsync(int id, MemberToUpdateDto updateDto, CancellationToken ct = default)
     {
-        var member = await memberRepo.GetByIdAsync(id, ct);
+        var member = await _unitOfWork.Members.GetByIdAsync(id, ct);
 
         if (member is null) return false;
         if (member.Name != updateDto.Name) return false;
@@ -155,8 +157,8 @@ public class MemberService(
         var email = updateDto.Email.Trim().ToLowerInvariant();
         var phone = updateDto.Phone;
 
-        if (await memberRepo.IsEmailTakenAsync(email, id, ct)) return false;
-        if (await memberRepo.IsPhoneTakenAsync(phone, id, ct)) return false;
+        if (await _unitOfWork.Members.IsEmailTakenAsync(email, id, ct)) return false;
+        if (await _unitOfWork.Members.IsPhoneTakenAsync(phone, id, ct)) return false;
 
         member.Email = email;
         member.Phone = phone;
@@ -164,7 +166,7 @@ public class MemberService(
         member.Address.Street = updateDto.Street.Trim();
         member.Address.City = updateDto.City.Trim();
 
-        var result = await memberRepo.SaveChangesAsync(ct);
+        var result = await _unitOfWork.CommitAsync(ct);
 
         if (result == 0) return false;
 
@@ -173,23 +175,23 @@ public class MemberService(
 
     public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
     {
-        var member = await memberRepo.GetByIdWithIncludesAsync(id, ct: ct,
+        var member = await _unitOfWork.Members.GetByIdWithIncludesAsync(id, ct: ct,
             includes: m => m.HealthRecord);
 
         if (member is null) return false;
 
-        if (await memberRepo.IsHasUpcomingBookingAsync(id, ct))
+        if (await _unitOfWork.Members.IsHasUpcomingBookingAsync(id, ct))
             return false;
 
-        memberRepo.Remove(member);
+        _unitOfWork.Members.Remove(member);
         //healthRepo.Remove(member.HealthRecord);
 
-        return (await memberRepo.SaveChangesAsync(ct)) > 0;
+        return (await _unitOfWork.CommitAsync(ct)) > 0;
     }
 
     public async Task<MemberDeleteDto?> GetForActivateAsync(int id, CancellationToken ct = default)
     {
-        var member = await memberRepo.GetByIdIncludingDeletedAsync(id, ct);
+        var member = await _unitOfWork.Members.GetByIdIncludingDeletedAsync(id, ct);
 
         if (member is null) return null;
 
@@ -204,7 +206,7 @@ public class MemberService(
 
     public async Task<bool> ActivateAsync(int id, CancellationToken ct = default)
     {
-        var member = await memberRepo.GetByIdWithIncludesAsync(id, includeDeleted: true, ct: ct,
+        var member = await _unitOfWork.Members.GetByIdWithIncludesAsync(id, includeDeleted: true, ct: ct,
             includes: [m => m.HealthRecord, m => m.Bookings, m => m.Memberships]);
 
         if (member is null) return false;
@@ -233,9 +235,9 @@ public class MemberService(
             }
         }
 
-        memberRepo.Update(member);
+        _unitOfWork.Members.Update(member);
 
-        var result = await memberRepo.SaveChangesAsync(ct);
+        var result = await _unitOfWork.CommitAsync(ct);
 
         if (result == 0) return false;
 

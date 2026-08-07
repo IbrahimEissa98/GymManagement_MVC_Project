@@ -4,11 +4,13 @@ using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 
 namespace GymManagement_MVC_Project.BLL.Services;
 
-public class PlanService(IPlanRepository planRepo) : IPlanService
+public class PlanService(IUnitOfWork unitOfWork) : IPlanService
 {
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
+
     public async Task<IReadOnlyList<PlanIndexDto>> GetAllAsync(CancellationToken ct = default)
     {
-        var plans = await planRepo.GetAllAsync(ct);
+        var plans = await _unitOfWork.Plans.GetAllAsync(ct);
 
         return [..plans.Select(p => new PlanIndexDto
         {
@@ -24,7 +26,7 @@ public class PlanService(IPlanRepository planRepo) : IPlanService
 
     public async Task<PlanIndexDto?> GetDetailsAsync(int id, CancellationToken ct = default)
     {
-        var plan = await planRepo.GetByIdAsync(id, ct);
+        var plan = await _unitOfWork.Plans.GetByIdAsync(id, ct);
 
         if (plan is null) return null;
 
@@ -43,7 +45,7 @@ public class PlanService(IPlanRepository planRepo) : IPlanService
 
     public async Task<PlanEditDto?> GetForEditAsync(int id, CancellationToken ct = default)
     {
-        var plan = await planRepo.GetByIdWithIncludesAsync(id, ct: ct, includes: p => p.Memberships);
+        var plan = await _unitOfWork.Plans.GetByIdWithIncludesAsync(id, ct: ct, includes: p => p.Memberships);
 
         if (plan is null || !plan.IsActive || plan.Memberships.Any(m => m.EndDate > DateTime.UtcNow))
             return null;
@@ -54,7 +56,7 @@ public class PlanService(IPlanRepository planRepo) : IPlanService
             Price = plan.Price,
             Description = plan.Description,
             DurationDays = plan.DurationDays,
-            IsActive =plan.IsActive
+            IsActive = plan.IsActive
         };
 
         return editDto;
@@ -62,7 +64,7 @@ public class PlanService(IPlanRepository planRepo) : IPlanService
 
     public async Task<bool> EditAsync(int id, PlanEditDto editDto, CancellationToken ct = default)
     {
-        var plan = await planRepo.GetByIdWithIncludesAsync(id, ct: ct, includes: p => p.Memberships);
+        var plan = await _unitOfWork.Plans.GetByIdWithIncludesAsync(id, ct: ct, includes: p => p.Memberships);
 
         if (plan is null || !plan.IsActive || plan.Memberships.Any(m => m.EndDate > DateTime.UtcNow))
             return false;
@@ -71,21 +73,21 @@ public class PlanService(IPlanRepository planRepo) : IPlanService
         plan.Description = editDto.Description;
         plan.DurationDays = editDto.DurationDays;
 
-        var result = await planRepo.SaveChangesAsync(ct);
+        var result = await _unitOfWork.CommitAsync(ct);
 
         return result > 0; ;
     }
 
     public async Task<bool> ToggleActivationAsync(int id, CancellationToken ct = default)
     {
-        var plan = await planRepo.GetByIdWithIncludesAsync(id, ct: ct, includes: p => p.Memberships);
+        var plan = await _unitOfWork.Plans.GetByIdWithIncludesAsync(id, ct: ct, includes: p => p.Memberships);
 
         if (plan is null || plan.Memberships.Any(m => m.EndDate > DateTime.UtcNow))
             return false;
 
         plan.IsActive = !plan.IsActive;
 
-        var result = await planRepo.SaveChangesAsync(ct);
+        var result = await _unitOfWork.CommitAsync(ct);
 
         return result > 0;
     }

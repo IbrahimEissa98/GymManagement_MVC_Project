@@ -6,13 +6,13 @@ using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 
 namespace GymManagement_MVC_Project.BLL.Services;
 
-public class TrainerService(ITrainerRepository trainerRepo) : ITrainerService
+public class TrainerService(IUnitOfWork unitOfWork) : ITrainerService
 {
-    private readonly ITrainerRepository _trainerRepo = trainerRepo;
+    private readonly IUnitOfWork _unitOfWork = unitOfWork;
 
     public async Task<IReadOnlyList<TrainerIndexDto>> GetAllAsync(CancellationToken ct = default)
     {
-        var trainers = await _trainerRepo.GetAllIncludingDeletedAsync(ct);
+        var trainers = await _unitOfWork.Trainers.GetAllIncludingDeletedAsync(ct);
 
         return [..trainers.Select(t => new TrainerIndexDto {
             Id = t.Id,
@@ -27,10 +27,10 @@ public class TrainerService(ITrainerRepository trainerRepo) : ITrainerService
     public async Task<bool> CreateAsync(TrainerCreateDto createDto, CancellationToken ct = default)
     {
         var email = createDto.Email.Trim().ToLower();
-        if (await _trainerRepo.IsEmailTakenAsync(email, ct: ct))
+        if (await _unitOfWork.Trainers.IsEmailTakenAsync(email, ct: ct))
             return false;
 
-        if (await _trainerRepo.IsPhoneTakenAsync(createDto.Phone, ct: ct))
+        if (await _unitOfWork.Trainers.IsPhoneTakenAsync(createDto.Phone, ct: ct))
             return false;
 
         Enum.TryParse(createDto.Gender, true, out GenderTypes gender);
@@ -53,16 +53,16 @@ public class TrainerService(ITrainerRepository trainerRepo) : ITrainerService
             HireDate = DateOnly.FromDateTime(DateTime.UtcNow)
         };
 
-        await _trainerRepo.AddAsync(trainer, ct);
+        await _unitOfWork.Trainers.AddAsync(trainer, ct);
 
-        var result = await _trainerRepo.SaveChangesAsync(ct);
+        var result = await _unitOfWork.CommitAsync(ct);
 
         return result > 0;
     }
 
     public async Task<TrainerDetailsDto?> GetDetailsAsync(int id, CancellationToken ct = default)
     {
-        var trainer = await _trainerRepo.GetByIdAsync(id, ct);
+        var trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
 
         if (trainer is null) return null;
 
@@ -86,7 +86,7 @@ public class TrainerService(ITrainerRepository trainerRepo) : ITrainerService
 
     public async Task<TrainerEditDto?> GetForEditAsync(int id, CancellationToken ct = default)
     {
-        var trainer = await _trainerRepo.GetByIdAsync(id, ct);
+        var trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
 
         if (trainer is null) return null;
 
@@ -106,7 +106,7 @@ public class TrainerService(ITrainerRepository trainerRepo) : ITrainerService
 
     public async Task<bool> EditAsync(int id, TrainerEditDto editDto, CancellationToken ct = default)
     {
-        var trainer = await _trainerRepo.GetByIdAsync(id, ct);
+        var trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
 
         if (trainer is null)
             return false;
@@ -116,10 +116,10 @@ public class TrainerService(ITrainerRepository trainerRepo) : ITrainerService
 
         var email = editDto.Email.Trim().ToLowerInvariant();
 
-        if (await _trainerRepo.IsEmailTakenAsync(email, includeId: id, ct))
+        if (await _unitOfWork.Trainers.IsEmailTakenAsync(email, includeId: id, ct))
             return false;
 
-        if (await _trainerRepo.IsPhoneTakenAsync(editDto.Phone, includeId: id, ct))
+        if (await _unitOfWork.Trainers.IsPhoneTakenAsync(editDto.Phone, includeId: id, ct))
             return false;
 
         if (!Enum.TryParse(editDto.Specialties, true, out TrainerSpecialties specialties))
@@ -132,7 +132,7 @@ public class TrainerService(ITrainerRepository trainerRepo) : ITrainerService
         trainer.Address.City = editDto.City;
         trainer.Specialties = specialties;
 
-        var result = await _trainerRepo.SaveChangesAsync(ct);
+        var result = await _unitOfWork.CommitAsync(ct);
 
         return result > 0;
     }
@@ -141,9 +141,9 @@ public class TrainerService(ITrainerRepository trainerRepo) : ITrainerService
     {
         Trainer? trainer;
         if (IsDelete)
-            trainer = await _trainerRepo.GetByIdAsync(id, ct);
+            trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
         else
-            trainer = await _trainerRepo.GetByIdIncludingDeletedAsync(id, ct);
+            trainer = await _unitOfWork.Trainers.GetByIdIncludingDeletedAsync(id, ct);
 
         if (trainer is null)
             return null;
@@ -159,22 +159,22 @@ public class TrainerService(ITrainerRepository trainerRepo) : ITrainerService
 
     public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
     {
-        var trainer = await _trainerRepo.GetByIdAsync(id, ct);
+        var trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
 
         if (trainer is null)
             return false;
 
-        if (await _trainerRepo.IsHasScheduledSessionsAsync(id, ct))
+        if (await _unitOfWork.Trainers.IsHasScheduledSessionsAsync(id, ct))
             return false;
 
-        _trainerRepo.Remove(trainer);
+        _unitOfWork.Trainers.Remove(trainer);
 
-        return (await _trainerRepo.SaveChangesAsync(ct)) > 0;
+        return (await _unitOfWork.CommitAsync(ct)) > 0;
     }
 
     public async Task<bool> ActivateAsync(int id, CancellationToken ct = default)
     {
-        var trainer = await _trainerRepo.GetByIdWithIncludesAsync
+        var trainer = await _unitOfWork.Trainers.GetByIdWithIncludesAsync
             (
                 id,
                 includeDeleted: true,
@@ -194,8 +194,8 @@ public class TrainerService(ITrainerRepository trainerRepo) : ITrainerService
             session.DeletedAt = null;
         }
 
-        _trainerRepo.Update(trainer);
+        _unitOfWork.Trainers.Update(trainer);
 
-        return (await _trainerRepo.SaveChangesAsync(ct)) > 0;
+        return (await _unitOfWork.CommitAsync(ct)) > 0;
     }
 }
