@@ -32,12 +32,12 @@ public class TimestampInterceptor : SaveChangesInterceptor
 
         foreach (var entry in entries)
         {
-            Console.WriteLine($"{entry.Metadata.ClrType.Name} | State = {entry.State}");
+            //Console.WriteLine($"{entry.Metadata.ClrType.Name} | State = {entry.State}");
 
-            foreach (var property in entry.Properties)
-            {
-                Console.WriteLine($"{property.Metadata.Name} | Modified = {property.IsModified} | Current = {property.CurrentValue}");
-            }
+            //foreach (var property in entry.Properties)
+            //{
+            //    Console.WriteLine($"{property.Metadata.Name} | Modified = {property.IsModified} | Current = {property.CurrentValue}");
+            //}
 
             switch (entry.State)
             {
@@ -51,13 +51,8 @@ public class TimestampInterceptor : SaveChangesInterceptor
                     break;
 
                 case EntityState.Deleted:
-                    //entry.State = EntityState.Modified;
-
-                    //entry.Entity.IsDeleted = true;
-                    //entry.Entity.UpdatedAt = now;
-                    //entry.Entity.DeletedAt = now;
-
-                    entry.State = EntityState.Unchanged;
+                    entry.State = EntityState.Modified;
+                    //entry.State = EntityState.Unchanged;
 
                     foreach (var reference in entry.References)
                     {
@@ -67,14 +62,18 @@ public class TimestampInterceptor : SaveChangesInterceptor
                         }
                     }
 
-                    entry.Property(e => e.IsDeleted).CurrentValue = true;
-                    entry.Property(e => e.IsDeleted).IsModified = true;
+                    entry.Entity.IsDeleted = true;
+                    entry.Entity.UpdatedAt = now;
+                    entry.Entity.DeletedAt = now;
 
-                    entry.Property(e => e.DeletedAt).CurrentValue = now;
-                    entry.Property(e => e.DeletedAt).IsModified = true;
+                    //entry.Property(e => e.IsDeleted).CurrentValue = true;
+                    //entry.Property(e => e.IsDeleted).IsModified = true;
 
-                    entry.Property(e => e.UpdatedAt).CurrentValue = now;
-                    entry.Property(e => e.UpdatedAt).IsModified = true;
+                    //entry.Property(e => e.DeletedAt).CurrentValue = now;
+                    //entry.Property(e => e.DeletedAt).IsModified = true;
+
+                    //entry.Property(e => e.UpdatedAt).CurrentValue = now;
+                    //entry.Property(e => e.UpdatedAt).IsModified = true;
 
                     entry.Property(nameof(IHasTimestamps.CreatedAt)).IsModified = false;
                     break;

@@ -8,7 +8,9 @@ using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 
 namespace GymManagement_MVC_Project.BLL.Services;
 
-public class MemberService(IMemberRepository memberRepo) : IMemberService
+public class MemberService(
+    IMemberRepository memberRepo
+    ) : IMemberService
 {
     public async Task<IReadOnlyList<MemberIndexDto>> GetAllAsync(CancellationToken ct)
     {
@@ -80,7 +82,9 @@ public class MemberService(IMemberRepository memberRepo) : IMemberService
 
         if (member is null) return null;
 
-        var membership = member.Memberships?.Where(m => m.EndDate > DateTime.UtcNow)?.FirstOrDefault();
+        var now = DateTime.UtcNow;
+
+        var membership = member.Memberships?.Where(m => m.StartDate <= now && m.EndDate >= now)?.FirstOrDefault();
 
         var address = string.Join(" - ", member.Address.BuildingNumber, member.Address.Street, member.Address.City);
 
@@ -169,19 +173,18 @@ public class MemberService(IMemberRepository memberRepo) : IMemberService
 
     public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
     {
-        var member = await memberRepo.GetByIdAsync(id, ct);
+        var member = await memberRepo.GetByIdWithIncludesAsync(id, ct: ct,
+            includes: m => m.HealthRecord);
 
         if (member is null) return false;
 
-        if (await memberRepo.IsHasUpcomingBookingAsync(id, ct)) return false;
+        if (await memberRepo.IsHasUpcomingBookingAsync(id, ct))
+            return false;
 
         memberRepo.Remove(member);
+        //healthRepo.Remove(member.HealthRecord);
 
-        var result = await memberRepo.SaveChangesAsync(ct);
-
-        if (result == 0) return false;
-
-        return true;
+        return (await memberRepo.SaveChangesAsync(ct)) > 0;
     }
 
     public async Task<MemberDeleteDto?> GetForActivateAsync(int id, CancellationToken ct = default)
