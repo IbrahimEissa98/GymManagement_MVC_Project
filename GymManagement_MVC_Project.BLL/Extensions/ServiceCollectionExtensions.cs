@@ -1,4 +1,6 @@
-﻿using GymManagement_MVC_Project.BLL.Services;
+﻿using GymManagement_MVC_Project.BLL.Providers;
+using GymManagement_MVC_Project.BLL.Providers.Contracts;
+using GymManagement_MVC_Project.BLL.Services;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
 using Microsoft.Extensions.DependencyInjection;
 
@@ -11,7 +13,8 @@ public static class ServiceCollectionExtensions
         services.AddScoped<IMemberService, MemberService>();
         services.AddScoped<IPlanService, PlanService>();
         services.AddScoped<ITrainerService, TrainerService>();
-        
+
+        services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 
         return services;
     }

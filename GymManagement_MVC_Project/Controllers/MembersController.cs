@@ -14,7 +14,7 @@ public class MembersController(IMemberService memberService) : Controller
     {
         var members = await memberService.GetAllAsync(ct);
 
-        var membersViewModel = members.Select(m => new MemberIndexViewModel
+        var membersViewModel = members.Value?.Select(m => new MemberIndexViewModel
         {
             Id = m.Id,
             PhotoUrl = m.PhotoUrl,
@@ -62,10 +62,18 @@ public class MembersController(IMemberService memberService) : Controller
 
         var result = await memberService.CreateAsync(createDto, ct);
 
-        if (result)
+        if (result.IsSuccess)
             TempData["SuccessMessage"] = "Member Created Successfully";
         else
-            TempData["FailMessage"] = "Failed To Create Member";
+        {
+            if (result.ErrorKey is not null)
+            {
+                ModelState.AddModelError(result.ErrorKey, result.Error!);
+                return View(model);
+            }
+            else
+                TempData["FailMessage"] = result.Error;
+        }
 
         return RedirectToAction(nameof(Index));
     }
@@ -73,9 +81,12 @@ public class MembersController(IMemberService memberService) : Controller
     [HttpGet]
     public async Task<IActionResult> Details(int id, CancellationToken ct)
     {
-        var memberDto = await memberService.GetDetailsAsync(id, ct);
+        var result = await memberService.GetDetailsAsync(id, ct);
 
-        if (memberDto is null) return NotFound();
+        if (!result.IsSuccess)
+            return NotFound(result.Error);
+
+        var memberDto = result.Value!;
 
         var memberViewModel = new MemberDetailsViewModel
         {
@@ -98,9 +109,12 @@ public class MembersController(IMemberService memberService) : Controller
     [HttpGet]
     public async Task<IActionResult> HealthDetails(int id, CancellationToken ct)
     {
-        var healthDto = await memberService.GetHealthRecordAsync(id, ct);
+        var result = await memberService.GetHealthRecordAsync(id, ct);
 
-        if (healthDto is null) return NotFound();
+        if (!result.IsSuccess)
+            return NotFound(result.Error);
+
+        var healthDto = result.Value!;
 
         var healthViewModel = new HealthRecordDetailsViewModel
         {
@@ -118,9 +132,12 @@ public class MembersController(IMemberService memberService) : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(int id, CancellationToken ct)
     {
-        var updateDto = await memberService.GetForUpdateAsync(id, ct);
+        var result = await memberService.GetForUpdateAsync(id, ct);
 
-        if (updateDto is null) return NotFound();
+        if (!result.IsSuccess)
+            return NotFound(result.Error);
+
+        var updateDto = result.Value!;
 
         var updateViewModel = new MemberToUpdateViewModel
         {
@@ -138,7 +155,7 @@ public class MembersController(IMemberService memberService) : Controller
 
     [HttpPost]
     [ValidateAntiForgeryToken]
-    public async Task<IActionResult> Edit([FromRoute]int id, MemberToUpdateViewModel updatedModel, CancellationToken ct)
+    public async Task<IActionResult> Edit([FromRoute] int id, MemberToUpdateViewModel updatedModel, CancellationToken ct)
     {
         if (!ModelState.IsValid) return View(updatedModel);
 
@@ -155,25 +172,34 @@ public class MembersController(IMemberService memberService) : Controller
 
         var result = await memberService.UpdateAsync(id, updatedDto, ct);
 
-        if (result)
+        if (result.IsSuccess)
             TempData["SuccessMessage"] = "Member Updated Successfully";
         else
-            TempData["FailMessage"] = "Failed To Update Member";
+        {
+            if (result.ErrorKey is not null)
+            {
+                ModelState.AddModelError(result.ErrorKey, result.Error!);
+                return View(updatedModel);
+            }
+            else
+                TempData["FailMessage"] = result.Error;
+        }
 
         return RedirectToAction(nameof(Index));
     }
 
     [HttpGet]
-    public async Task<IActionResult> Delete([FromRoute]int id, CancellationToken ct)
+    public async Task<IActionResult> Delete([FromRoute] int id, CancellationToken ct)
     {
-        var member = await memberService.GetForUpdateAsync(id, ct);
+        var result = await memberService.GetForUpdateAsync(id, ct);
 
-        if (member is null) return NotFound();
+        if (!result.IsSuccess)
+            return NotFound(result.Error);
 
         var deleteViewModel = new MemberDeleteViewModel
         {
             Id = id,
-            Name = member.Name
+            Name = result.Value!.Name
         };
 
         return View(deleteViewModel);
@@ -186,25 +212,26 @@ public class MembersController(IMemberService memberService) : Controller
     {
         var result = await memberService.DeleteAsync(id, ct);
 
-        if (result)
+        if (result.IsSuccess)
             TempData["SuccessMessage"] = "Member Deactivated Successfully";
         else
-            TempData["FailMessage"] = "Failed To Deactivate Member";
+            TempData["FailMessage"] = result.Error;
 
         return RedirectToAction(nameof(Index));
     }
 
     [HttpGet]
-    public async Task<IActionResult> Activate([FromRoute]int id, CancellationToken ct)
+    public async Task<IActionResult> Activate([FromRoute] int id, CancellationToken ct)
     {
-        var member = await memberService.GetForActivateAsync(id, ct);
+        var result = await memberService.GetForActivateAsync(id, ct);
 
-        if (member is null) return NotFound();
+        if (!result.IsSuccess)
+            return NotFound(result.Error);
 
         var activateViewModel = new MemberDeleteViewModel
         {
             Id = id,
-            Name = member.Name
+            Name = result.Value!.Name
         };
 
         return View(activateViewModel);
@@ -217,10 +244,10 @@ public class MembersController(IMemberService memberService) : Controller
     {
         var result = await memberService.ActivateAsync(id, ct);
 
-        if (result)
+        if (result.IsSuccess)
             TempData["SuccessMessage"] = "Member Activated Successfully";
         else
-            TempData["FailMessage"] = "Failed To Activate Member";
+            TempData["FailMessage"] = result.Error;
 
         return RedirectToAction(nameof(Index));
     }

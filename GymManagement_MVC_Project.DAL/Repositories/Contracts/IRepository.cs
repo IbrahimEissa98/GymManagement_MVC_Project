@@ -9,14 +9,14 @@ public interface IRepository<TEntity> where TEntity : BaseEntity
     Task<IReadOnlyList<TEntity>> GetAllIncludingDeletedAsync(CancellationToken ct = default);
     Task<TEntity?> GetByIdAsync(int id, CancellationToken ct = default);
     Task<TEntity?> GetByIdWithIncludesAsync(int id,
-                                            bool includeDeleted = false, 
+                                            bool includeDeleted = false,
                                             CancellationToken ct = default,
-                                            params Expression<Func<TEntity, object>>[] includes );
+                                            params Expression<Func<TEntity, object>>[] includes);
     Task<TEntity?> GetByIdIncludingDeletedAsync(int id, CancellationToken ct = default);
     Task<IReadOnlyList<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, CancellationToken ct = default);
     Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> expression, CancellationToken ct = default);
     Task AddAsync(TEntity entity, CancellationToken ct = default);
     void Update(TEntity entity);
     void Remove(TEntity entity);
-    Task<int> SaveChangesAsync(CancellationToken ct = default);
+    //Task<int> SaveChangesAsync(CancellationToken ct = default);
 }

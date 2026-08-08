@@ -11,7 +11,8 @@ public class PlansController(IPlanService planService) : Controller
     {
         var plans = await planService.GetAllAsync();
 
-        var plansViewModel = plans.Select(p => new PlanIndexViewModel
+
+        var plansViewModel = plans.Value?.Select(p => new PlanIndexViewModel
         {
             Id = p.Id,
             Name = p.Name,
@@ -27,10 +28,12 @@ public class PlansController(IPlanService planService) : Controller
     [HttpGet]
     public async Task<IActionResult> Details(int id)
     {
-        var plan = await planService.GetDetailsAsync(id);
+        var result = await planService.GetDetailsAsync(id);
 
-        if (plan is null)
-            return NotFound();
+        if (!result.IsSuccess)
+            return NotFound(result.Error);
+
+        var plan = result.Value!;
 
         var planViewModel = new PlanIndexViewModel
         {
@@ -48,13 +51,15 @@ public class PlansController(IPlanService planService) : Controller
     [HttpGet]
     public async Task<IActionResult> Edit(int id, CancellationToken ct)
     {
-        var planDto = await planService.GetForEditAsync(id, ct);
+        var result = await planService.GetForEditAsync(id, ct);
 
-        if (planDto is null)
+        if (!result.IsSuccess)
         {
-            TempData["FailMessage"] = "Failed To Update This Plan";
+            TempData["FailMessage"] = result.Error;
             return RedirectToAction(nameof(Index));
         }
+
+        var planDto = result.Value!;
 
         var editViewModel = new PlanEditViewModel
         {
@@ -83,10 +88,10 @@ public class PlansController(IPlanService planService) : Controller
 
         var result = await planService.EditAsync(id, editDto, ct);
 
-        if (result)
+        if (result.IsSuccess)
             TempData["SuccessMessage"] = "Plan Updated Successfully";
         else
-            TempData["FailMessage"] = "Failed To Update Plan";
+            TempData["FailMessage"] = result.Error;
 
         return RedirectToAction(nameof(Index));
     }
@@ -96,10 +101,10 @@ public class PlansController(IPlanService planService) : Controller
     {
         var result = await planService.ToggleActivationAsync(id, ct);
 
-        if (result)
+        if (result.IsSuccess)
             TempData["SuccessMessage"] = "Plan Activation Toggled Successfully";
         else
-            TempData["FailMessage"] = "Failed To Toggle Plan Activation";
+            TempData["FailMessage"] = result.Error;
 
         return RedirectToAction(nameof(Index));
     }

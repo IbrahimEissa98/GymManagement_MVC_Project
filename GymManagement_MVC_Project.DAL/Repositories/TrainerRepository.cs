@@ -19,12 +19,12 @@ public class TrainerRepository(GymDbContext gymDbContext) : Repository<Trainer>(
         return await ExistsAsync(t => t.Phone == phone && (!includeId.HasValue || t.Id != includeId), ct);
     }
 
-    public async Task<bool> IsHasScheduledSessionsAsync(int id, CancellationToken ct = default)
+    public async Task<bool> IsHasScheduledSessionsAsync(int id, DateTime date, CancellationToken ct = default)
     {
         return await _gymDbContext.Trainers
                                     .AsNoTracking()
                                     .Where(t => t.Id == id)
                                     .SelectMany(t => t.Sessions)
-                                    .AnyAsync(b => b.EndDate > DateTime.UtcNow, ct);
+                                    .AnyAsync(b => b.EndDate > date, ct);
     }
 }

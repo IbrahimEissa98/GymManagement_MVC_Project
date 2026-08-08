@@ -1,6 +1,8 @@
-﻿using GymManagement_MVC_Project.BLL.DTOs.HealthRecord;
+﻿using GymManagement_MVC_Project.BLL.Common;
+using GymManagement_MVC_Project.BLL.DTOs.HealthRecord;
 using GymManagement_MVC_Project.BLL.DTOs.Member;
 using GymManagement_MVC_Project.BLL.Extensions;
+using GymManagement_MVC_Project.BLL.Providers.Contracts;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.DAL.Models;
 using GymManagement_MVC_Project.DAL.Models.Enums;
@@ -9,16 +11,18 @@ using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 namespace GymManagement_MVC_Project.BLL.Services;
 
 public class MemberService(
-    IUnitOfWork unitOfWork
+    IUnitOfWork unitOfWork,
+    IDateTimeProvider clock
     ) : IMemberService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IDateTimeProvider _clock = clock;
 
-    public async Task<IReadOnlyList<MemberIndexDto>> GetAllAsync(CancellationToken ct)
+    public async Task<Result<IReadOnlyList<MemberIndexDto>>> GetAllAsync(CancellationToken ct)
     {
         var members = await _unitOfWork.Members.GetAllIncludingDeletedAsync(ct);
 
-        return [.. members.Select(m => new MemberIndexDto
+        return Result<IReadOnlyList<MemberIndexDto>>.Success([.. members.Select(m => new MemberIndexDto
         {
             Id = m.Id,
             Name = m.Name,
@@ -27,24 +31,24 @@ public class MemberService(
             Phone = m.Phone,
             PhotoUrl = m.Photo,
             IsDeleted = m.IsDeleted
-        })];
+        })]);
     }
 
-    public async Task<bool> CreateAsync(MemberCreateDto createDto, CancellationToken ct = default)
+    public async Task<Result> CreateAsync(MemberCreateDto createDto, CancellationToken ct = default)
     {
         var email = createDto.Email.Trim().ToLower();
         if (await _unitOfWork.Members.IsEmailTakenAsync(email, ct: ct))
-            return false;
+            return Result.Failure("Email is already taken.", ErrorType.Validation, nameof(createDto.Email));
 
         var phone = createDto.Phone.Trim().ToLower();
         if (await _unitOfWork.Members.IsPhoneTakenAsync(createDto.Phone, ct: ct))
-            return false;
+            return Result.Failure("Phone is already taken.", ErrorType.Validation, nameof(createDto.Phone));
 
         if (!Enum.TryParse(createDto.Gender, true, out GenderTypes gender))
-            return false;
+            return Result.Failure("Gender not valid", ErrorType.NotFound, nameof(createDto.Gender));
 
         if (!Enum.TryParse(createDto.HealthRecord.BloodType, true, out BloodTypes bloodType))
-            return false;
+            return Result.Failure("Blood Type not valid", ErrorType.NotFound, nameof(createDto.HealthRecord.BloodType));
 
         var member = new Member
         {
@@ -66,27 +70,24 @@ public class MemberService(
                 Note = createDto.HealthRecord.Note,
                 BloodType = bloodType
             },
-            JoinDate = DateOnly.FromDateTime(DateTime.UtcNow)
+            JoinDate = _clock.Today
         };
 
         await _unitOfWork.Members.AddAsync(member, ct);
 
         var result = await _unitOfWork.CommitAsync(ct);
 
-        if (result == 0) return false;
-
-        return true;
+        return result > 0 ? Result.Success() : Result.Failure("Failed to create member.", ErrorType.Failure);
     }
 
-    public async Task<MemberDetailsDto?> GetDetailsAsync(int id, CancellationToken ct = default)
+    public async Task<Result<MemberDetailsDto>> GetDetailsAsync(int id, CancellationToken ct = default)
     {
-        var member = await _unitOfWork.Members.GetByIdWithMembershipAsync(id, ct);
+        var member = await _unitOfWork.Members.GetByIdWithMembershipAsync(id, _clock.UtcNow, ct);
 
-        if (member is null) return null;
+        if (member is null)
+            return Result<MemberDetailsDto>.Failure("Member not found.", ErrorType.NotFound);
 
-        var now = DateTime.UtcNow;
-
-        var membership = member.Memberships?.Where(m => m.StartDate <= now && m.EndDate >= now)?.FirstOrDefault();
+        var membership = member.Memberships.FirstOrDefault();
 
         var address = string.Join(" - ", member.Address.BuildingNumber, member.Address.Street, member.Address.City);
 
@@ -105,14 +106,15 @@ public class MemberService(
             PlanName = membership?.Plan.Name
         };
 
-        return memberDto;
+        return Result<MemberDetailsDto>.Success(memberDto);
     }
 
-    public async Task<HealthRecordDetailsDto?> GetHealthRecordAsync(int id, CancellationToken ct = default)
+    public async Task<Result<HealthRecordDetailsDto>> GetHealthRecordAsync(int id, CancellationToken ct = default)
     {
         var member = await _unitOfWork.Members.GetByIdWithIncludesAsync(id, ct: ct, includes: m => m.HealthRecord);
 
-        if (member is null) return null;
+        if (member is null)
+            return Result<HealthRecordDetailsDto>.Failure("Health Record not found.", ErrorType.NotFound);
 
         var healthDto = new HealthRecordDetailsDto
         {
@@ -124,14 +126,15 @@ public class MemberService(
             Note = member.HealthRecord.Note
         };
 
-        return healthDto;
+        return Result<HealthRecordDetailsDto>.Success(healthDto);
     }
 
-    public async Task<MemberToUpdateDto?> GetForUpdateAsync(int id, CancellationToken ct = default)
+    public async Task<Result<MemberToUpdateDto>> GetForUpdateAsync(int id, CancellationToken ct = default)
     {
         var member = await _unitOfWork.Members.GetByIdAsync(id, ct);
 
-        if (member is null) return null;
+        if (member is null)
+            return Result<MemberToUpdateDto>.Failure("Member not found.", ErrorType.NotFound);
 
         var updateDto = new MemberToUpdateDto
         {
@@ -144,21 +147,27 @@ public class MemberService(
             City = member.Address.City
         };
 
-        return updateDto;
+        return Result<MemberToUpdateDto>.Success(updateDto);
     }
 
-    public async Task<bool> UpdateAsync(int id, MemberToUpdateDto updateDto, CancellationToken ct = default)
+    public async Task<Result> UpdateAsync(int id, MemberToUpdateDto updateDto, CancellationToken ct = default)
     {
         var member = await _unitOfWork.Members.GetByIdAsync(id, ct);
 
-        if (member is null) return false;
-        if (member.Name != updateDto.Name) return false;
+        if (member is null)
+            return Result.Failure("Member not found.", ErrorType.NotFound);
+
+        if (member.Name != updateDto.Name)
+            return Result.Failure("Member name not allowed to update.", ErrorType.Validation);
 
         var email = updateDto.Email.Trim().ToLowerInvariant();
         var phone = updateDto.Phone;
 
-        if (await _unitOfWork.Members.IsEmailTakenAsync(email, id, ct)) return false;
-        if (await _unitOfWork.Members.IsPhoneTakenAsync(phone, id, ct)) return false;
+        if (await _unitOfWork.Members.IsEmailTakenAsync(email, id, ct))
+            return Result.Failure("Email is already taken.", ErrorType.Validation, nameof(updateDto.Email));
+
+        if (await _unitOfWork.Members.IsPhoneTakenAsync(phone, id, ct))
+            return Result.Failure("Phone is already taken.", ErrorType.Validation, nameof(updateDto.Phone));
 
         member.Email = email;
         member.Phone = phone;
@@ -168,32 +177,33 @@ public class MemberService(
 
         var result = await _unitOfWork.CommitAsync(ct);
 
-        if (result == 0) return false;
-
-        return true;
+        return result > 0 ? Result.Success() : Result.Failure("Failed to update member.", ErrorType.Failure);
     }
 
-    public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
+    public async Task<Result> DeleteAsync(int id, CancellationToken ct = default)
     {
         var member = await _unitOfWork.Members.GetByIdWithIncludesAsync(id, ct: ct,
             includes: m => m.HealthRecord);
 
-        if (member is null) return false;
+        if (member is null)
+            return Result.Failure("Member not found.", ErrorType.NotFound);
 
-        if (await _unitOfWork.Members.IsHasUpcomingBookingAsync(id, ct))
-            return false;
+        if (await _unitOfWork.Members.IsHasUpcomingBookingAsync(id, _clock.UtcNow, ct))
+            return Result.Failure("Can not delete member with upcoming Bookings", ErrorType.Failure);
 
         _unitOfWork.Members.Remove(member);
         //healthRepo.Remove(member.HealthRecord);
 
-        return (await _unitOfWork.CommitAsync(ct)) > 0;
+        var result = await _unitOfWork.CommitAsync(ct);
+        return result > 0 ? Result.Success() : Result.Failure("Failed to delete member.", ErrorType.Failure);
     }
 
-    public async Task<MemberDeleteDto?> GetForActivateAsync(int id, CancellationToken ct = default)
+    public async Task<Result<MemberDeleteDto>> GetForActivateAsync(int id, CancellationToken ct = default)
     {
         var member = await _unitOfWork.Members.GetByIdIncludingDeletedAsync(id, ct);
 
-        if (member is null) return null;
+        if (member is null)
+            return Result<MemberDeleteDto>.Failure("Member not found.", ErrorType.NotFound);
 
         var activateDto = new MemberDeleteDto
         {
@@ -201,15 +211,16 @@ public class MemberService(
             Name = member.Name
         };
 
-        return activateDto;
+        return Result<MemberDeleteDto>.Success(activateDto);
     }
 
-    public async Task<bool> ActivateAsync(int id, CancellationToken ct = default)
+    public async Task<Result> ActivateAsync(int id, CancellationToken ct = default)
     {
         var member = await _unitOfWork.Members.GetByIdWithIncludesAsync(id, includeDeleted: true, ct: ct,
             includes: [m => m.HealthRecord, m => m.Bookings, m => m.Memberships]);
 
-        if (member is null) return false;
+        if (member is null)
+            return Result.Failure("Member not found.", ErrorType.NotFound);
 
         member.IsDeleted = false;
         member.DeletedAt = null;
@@ -239,8 +250,6 @@ public class MemberService(
 
         var result = await _unitOfWork.CommitAsync(ct);
 
-        if (result == 0) return false;
-
-        return true;
+        return result > 0 ? Result.Success() : Result.Failure("Failed to activate member.", ErrorType.Failure);
     }
 }

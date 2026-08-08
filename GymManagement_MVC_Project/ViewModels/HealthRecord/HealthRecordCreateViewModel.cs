@@ -5,7 +5,7 @@ namespace GymManagement_MVC_Project.PL.ViewModels.HealthRecord;
 
 public class HealthRecordCreateViewModel
 {
-    [Range(0.1, 300, ErrorMessage = "Height must be greater than 0")]
+    [Range(0.1, 230, ErrorMessage = "Height must be greater than 0")]
     public int Height { get; set; }
 
     [Range(0.1, 500, ErrorMessage = "Weight must be greater than 0")]

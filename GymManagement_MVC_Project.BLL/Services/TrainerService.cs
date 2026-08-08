@@ -1,4 +1,5 @@
 ﻿using GymManagement_MVC_Project.BLL.DTOs.Trainer;
+using GymManagement_MVC_Project.BLL.Providers.Contracts;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.DAL.Models;
 using GymManagement_MVC_Project.DAL.Models.Enums;
@@ -6,9 +7,10 @@ using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 
 namespace GymManagement_MVC_Project.BLL.Services;
 
-public class TrainerService(IUnitOfWork unitOfWork) : ITrainerService
+public class TrainerService(IUnitOfWork unitOfWork, IDateTimeProvider clock) : ITrainerService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
+    private readonly IDateTimeProvider _clock = clock;
 
     public async Task<IReadOnlyList<TrainerIndexDto>> GetAllAsync(CancellationToken ct = default)
     {
@@ -50,7 +52,7 @@ public class TrainerService(IUnitOfWork unitOfWork) : ITrainerService
                 Street = createDto.Street,
                 BuildingNumber = createDto.BuildingNumber,
             },
-            HireDate = DateOnly.FromDateTime(DateTime.UtcNow)
+            HireDate = _clock.Today
         };
 
         await _unitOfWork.Trainers.AddAsync(trainer, ct);
@@ -164,7 +166,7 @@ public class TrainerService(IUnitOfWork unitOfWork) : ITrainerService
         if (trainer is null)
             return false;
 
-        if (await _unitOfWork.Trainers.IsHasScheduledSessionsAsync(id, ct))
+        if (await _unitOfWork.Trainers.IsHasScheduledSessionsAsync(id, _clock.UtcNow, ct))
             return false;
 
         _unitOfWork.Trainers.Remove(trainer);
