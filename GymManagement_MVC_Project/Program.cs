@@ -1,7 +1,9 @@
 using GymManagement_MVC_Project.BLL.Extensions;
+using GymManagement_MVC_Project.BLL.Profiles;
 using GymManagement_MVC_Project.DAL;
 using GymManagement_MVC_Project.DAL.Data.Contexts;
 using GymManagement_MVC_Project.DAL.Data.Seeder;
+using GymManagement_MVC_Project.PL.Profiles;
 using Microsoft.EntityFrameworkCore;
 
 var builder = WebApplication.CreateBuilder(args);
@@ -9,11 +11,21 @@ var builder = WebApplication.CreateBuilder(args);
 // Add services to the container.
 builder.Services.AddControllersWithViews();
 
-var connectionString = builder.Configuration.GetConnectionString("DefaultConnection") 
-        ?? throw new InvalidOperationException("The DefaultConnection string not found");
+var connectionString = builder.Configuration.GetConnectionString("DefaultConnection")
+        ?? throw new InvalidOperationException("The Default Connection string not found");
+
+var autoMapperLicenseKey = builder.Configuration.GetSection("AutoMapper:LicenseKey").Value
+        ?? throw new InvalidOperationException("The AutoMapper License Key not found");
 
 builder.Services.AddGymDataAccess(connectionString);
-builder.Services.AddGymBusinessLogic();
+builder.Services.AddGymBusinessLogic(autoMapperLicenseKey);
+
+
+builder.Services.AddAutoMapper(config =>
+{
+    config.LicenseKey = autoMapperLicenseKey;
+},
+        typeof(PlanDtoProfile).Assembly, typeof(PlanVMProfile).Assembly);
 
 var app = builder.Build();
 

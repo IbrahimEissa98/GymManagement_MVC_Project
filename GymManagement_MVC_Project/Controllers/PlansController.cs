@@ -1,26 +1,21 @@
-﻿using GymManagement_MVC_Project.BLL.DTOs.Plan;
+﻿using AutoMapper;
+using GymManagement_MVC_Project.BLL.DTOs.Plan;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.PL.ViewModels.Plan;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagement_MVC_Project.PL.Controllers;
 
-public class PlansController(IPlanService planService) : Controller
+public class PlansController(IPlanService planService, IMapper mapper) : Controller
 {
+    private readonly IMapper _mapper = mapper;
+
     public async Task<IActionResult> Index()
     {
-        var plans = await planService.GetAllAsync();
+        var plansDto = await planService.GetAllAsync();
 
-
-        var plansViewModel = plans.Value?.Select(p => new PlanIndexViewModel
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Price = p.Price,
-            Description = p.Description,
-            DurationDays = p.DurationDays,
-            IsActive = p.IsActive
-        });
+        //var plansViewModel = plansDto.Value?.Select(p => _mapper.Map<PlanIndexViewModel>(p));
+        var plansViewModel = _mapper.Map<IEnumerable<PlanIndexViewModel>>(plansDto.Value);
 
         return View(plansViewModel);
     }
@@ -33,17 +28,7 @@ public class PlansController(IPlanService planService) : Controller
         if (!result.IsSuccess)
             return NotFound(result.Error);
 
-        var plan = result.Value!;
-
-        var planViewModel = new PlanIndexViewModel
-        {
-            Id = plan.Id,
-            Name = plan.Name,
-            Price = plan.Price,
-            Description = plan.Description,
-            DurationDays = plan.DurationDays,
-            IsActive = plan.IsActive
-        };
+        var planViewModel = _mapper.Map<PlanIndexViewModel>(result.Value);
 
         return View(planViewModel);
     }
@@ -78,13 +63,7 @@ public class PlansController(IPlanService planService) : Controller
     {
         if (!ModelState.IsValid) return View(editViewModel);
 
-        var editDto = new PlanEditDto
-        {
-            Name = editViewModel.Name,
-            Price = editViewModel.Price,
-            Description = editViewModel.Description,
-            DurationDays = editViewModel.DurationDays
-        };
+        var editDto = _mapper.Map<PlanEditDto>(editViewModel);
 
         var result = await planService.EditAsync(id, editDto, ct);
 

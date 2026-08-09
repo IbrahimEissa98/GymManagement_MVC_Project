@@ -1,4 +1,4 @@
-﻿using GymManagement_MVC_Project.BLL.DTOs.HealthRecord;
+﻿using AutoMapper;
 using GymManagement_MVC_Project.BLL.DTOs.Member;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.PL.ViewModels.HealthRecord;
@@ -7,23 +7,16 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagement_MVC_Project.PL.Controllers;
 
-public class MembersController(IMemberService memberService) : Controller
+public class MembersController(IMemberService memberService, IMapper mapper) : Controller
 {
+    private readonly IMapper _mapper = mapper;
+
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken ct)
     {
         var members = await memberService.GetAllAsync(ct);
 
-        var membersViewModel = members.Value?.Select(m => new MemberIndexViewModel
-        {
-            Id = m.Id,
-            PhotoUrl = m.PhotoUrl,
-            Name = m.Name,
-            Email = m.Email,
-            Phone = m.Phone,
-            Gender = m.Gender,
-            IsDeleted = m.IsDeleted
-        });
+        var membersViewModel = _mapper.Map<IReadOnlyList<MemberIndexViewModel>>(members.Value);
 
         return View(membersViewModel);
     }
@@ -41,34 +34,15 @@ public class MembersController(IMemberService memberService) : Controller
         if (!ModelState.IsValid)
             return View(model);
 
-        var createDto = new MemberCreateDto
-        {
-            Name = model.Name,
-            Email = model.Email,
-            Phone = model.Phone,
-            Gender = model.Gender,
-            DateOfBirth = model.DateOfBirth,
-            BuildingNumber = model.BuildingNumber,
-            Street = model.Street,
-            City = model.City,
-            HealthRecord = new HealthRecordCreateDto
-            {
-                Height = model.HealthRecord.Height,
-                Weight = model.HealthRecord.Weight,
-                BloodType = model.HealthRecord.BloodType,
-                Note = model.HealthRecord.Note
-            }
-        };
-
-        var result = await memberService.CreateAsync(createDto, ct);
+        var result = await memberService.CreateAsync(_mapper.Map<MemberCreateDto>(model), ct);
 
         if (result.IsSuccess)
             TempData["SuccessMessage"] = "Member Created Successfully";
         else
         {
-            if (result.ErrorKey is not null)
+            if (result.ErrorKey is not null && result.Error is not null)
             {
-                ModelState.AddModelError(result.ErrorKey, result.Error!);
+                ModelState.AddModelError(result.ErrorKey, result.Error);
                 return View(model);
             }
             else
@@ -86,22 +60,7 @@ public class MembersController(IMemberService memberService) : Controller
         if (!result.IsSuccess)
             return NotFound(result.Error);
 
-        var memberDto = result.Value!;
-
-        var memberViewModel = new MemberDetailsViewModel
-        {
-            Id = memberDto.Id,
-            PhotoUrl = memberDto.PhotoUrl,
-            Name = memberDto.Name,
-            Email = memberDto.Email,
-            Phone = memberDto.Phone,
-            Gender = memberDto.Gender.ToString(),
-            DateOfBirth = memberDto.DateOfBirth,
-            Address = memberDto.Address,
-            MembershipStartDate = memberDto.MembershipStartDate,
-            MembershipEndDate = memberDto.MembershipEndDate,
-            PlanName = memberDto.PlanName
-        };
+        var memberViewModel = _mapper.Map<MemberDetailsViewModel>(result.Value);
 
         return View(memberViewModel);
     }
@@ -114,17 +73,7 @@ public class MembersController(IMemberService memberService) : Controller
         if (!result.IsSuccess)
             return NotFound(result.Error);
 
-        var healthDto = result.Value!;
-
-        var healthViewModel = new HealthRecordDetailsViewModel
-        {
-            PhotoUrl = healthDto.PhotoUrl,
-            Name = healthDto.Name,
-            Height = healthDto.Height,
-            Weight = healthDto.Weight,
-            BloodType = healthDto.BloodType,
-            Note = healthDto.Note
-        };
+        var healthViewModel = _mapper.Map<HealthRecordDetailsViewModel>(result.Value);
 
         return View(healthViewModel);
     }
@@ -137,18 +86,7 @@ public class MembersController(IMemberService memberService) : Controller
         if (!result.IsSuccess)
             return NotFound(result.Error);
 
-        var updateDto = result.Value!;
-
-        var updateViewModel = new MemberToUpdateViewModel
-        {
-            Name = updateDto.Name,
-            PhotoUrl = updateDto.PhotoUrl,
-            Email = updateDto.Email,
-            Phone = updateDto.Phone,
-            BuildingNumber = updateDto.BuildingNumber,
-            Street = updateDto.Street,
-            City = updateDto.City
-        };
+        var updateViewModel = _mapper.Map<MemberToUpdateViewModel>(result.Value);
 
         return View(updateViewModel);
     }
@@ -157,18 +95,10 @@ public class MembersController(IMemberService memberService) : Controller
     [ValidateAntiForgeryToken]
     public async Task<IActionResult> Edit([FromRoute] int id, MemberToUpdateViewModel updatedModel, CancellationToken ct)
     {
-        if (!ModelState.IsValid) return View(updatedModel);
+        if (!ModelState.IsValid)
+            return View(updatedModel);
 
-        var updatedDto = new MemberToUpdateDto
-        {
-            Name = updatedModel.Name,
-            PhotoUrl = updatedModel.PhotoUrl,
-            Email = updatedModel.Email,
-            Phone = updatedModel.Phone,
-            BuildingNumber = updatedModel.BuildingNumber,
-            Street = updatedModel.Street,
-            City = updatedModel.City
-        };
+        var updatedDto = _mapper.Map<MemberToUpdateDto>(updatedModel);
 
         var result = await memberService.UpdateAsync(id, updatedDto, ct);
 

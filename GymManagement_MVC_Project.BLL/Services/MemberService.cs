@@ -1,7 +1,7 @@
-﻿using GymManagement_MVC_Project.BLL.Common;
+﻿using AutoMapper;
+using GymManagement_MVC_Project.BLL.Common;
 using GymManagement_MVC_Project.BLL.DTOs.HealthRecord;
 using GymManagement_MVC_Project.BLL.DTOs.Member;
-using GymManagement_MVC_Project.BLL.Extensions;
 using GymManagement_MVC_Project.BLL.Providers.Contracts;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.DAL.Models;
@@ -12,26 +12,20 @@ namespace GymManagement_MVC_Project.BLL.Services;
 
 public class MemberService(
     IUnitOfWork unitOfWork,
-    IDateTimeProvider clock
+    IDateTimeProvider clock,
+    IMapper mapper
     ) : IMemberService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IDateTimeProvider _clock = clock;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<Result<IReadOnlyList<MemberIndexDto>>> GetAllAsync(CancellationToken ct)
     {
         var members = await _unitOfWork.Members.GetAllIncludingDeletedAsync(ct);
 
-        return Result<IReadOnlyList<MemberIndexDto>>.Success([.. members.Select(m => new MemberIndexDto
-        {
-            Id = m.Id,
-            Name = m.Name,
-            Email = m.Email,
-            Gender = m.Gender.ToString(),
-            Phone = m.Phone,
-            PhotoUrl = m.Photo,
-            IsDeleted = m.IsDeleted
-        })]);
+        return Result<IReadOnlyList<MemberIndexDto>>.Success
+                (_mapper.Map<IReadOnlyList<MemberIndexDto>>(members));
     }
 
     public async Task<Result> CreateAsync(MemberCreateDto createDto, CancellationToken ct = default)
@@ -50,28 +44,7 @@ public class MemberService(
         if (!Enum.TryParse(createDto.HealthRecord.BloodType, true, out BloodTypes bloodType))
             return Result.Failure("Blood Type not valid", ErrorType.NotFound, nameof(createDto.HealthRecord.BloodType));
 
-        var member = new Member
-        {
-            Name = createDto.Name,
-            Email = email,
-            Phone = phone,
-            DateOfBirth = createDto.DateOfBirth,
-            Gender = gender,
-            Address = new Address
-            {
-                City = createDto.City,
-                Street = createDto.Street,
-                BuildingNumber = createDto.BuildingNumber,
-            },
-            HealthRecord = new HealthRecord
-            {
-                Height = createDto.HealthRecord.Height,
-                Weight = createDto.HealthRecord.Weight,
-                Note = createDto.HealthRecord.Note,
-                BloodType = bloodType
-            },
-            JoinDate = _clock.Today
-        };
+        var member = _mapper.Map<Member>(createDto);
 
         await _unitOfWork.Members.AddAsync(member, ct);
 
@@ -87,24 +60,7 @@ public class MemberService(
         if (member is null)
             return Result<MemberDetailsDto>.Failure("Member not found.", ErrorType.NotFound);
 
-        var membership = member.Memberships.FirstOrDefault();
-
-        var address = string.Join(" - ", member.Address.BuildingNumber, member.Address.Street, member.Address.City);
-
-        var memberDto = new MemberDetailsDto
-        {
-            Id = member.Id,
-            PhotoUrl = member.Photo,
-            Name = member.Name,
-            Email = member.Email,
-            Phone = member.Phone,
-            Gender = member.Gender.ToString(),
-            DateOfBirth = member.DateOfBirth.ToString("dd/MM/yyyy"),
-            Address = address,
-            MembershipStartDate = membership?.StartDate.ToString("dd/MM/yyyy"),
-            MembershipEndDate = membership?.EndDate.ToString("dd/MM/yyyy"),
-            PlanName = membership?.Plan.Name
-        };
+        var memberDto = _mapper.Map<MemberDetailsDto>(member);
 
         return Result<MemberDetailsDto>.Success(memberDto);
     }
@@ -116,15 +72,7 @@ public class MemberService(
         if (member is null)
             return Result<HealthRecordDetailsDto>.Failure("Health Record not found.", ErrorType.NotFound);
 
-        var healthDto = new HealthRecordDetailsDto
-        {
-            PhotoUrl = member.Photo,
-            Name = member.Name,
-            Height = (int)member.HealthRecord.Height,
-            Weight = (int)member.HealthRecord.Weight,
-            BloodType = member.HealthRecord.BloodType.GetDisplayName(),
-            Note = member.HealthRecord.Note
-        };
+        var healthDto = _mapper.Map<HealthRecordDetailsDto>(member);
 
         return Result<HealthRecordDetailsDto>.Success(healthDto);
     }
@@ -136,16 +84,7 @@ public class MemberService(
         if (member is null)
             return Result<MemberToUpdateDto>.Failure("Member not found.", ErrorType.NotFound);
 
-        var updateDto = new MemberToUpdateDto
-        {
-            Name = member.Name,
-            PhotoUrl = member.Photo,
-            Email = member.Email,
-            Phone = member.Phone,
-            BuildingNumber = member.Address.BuildingNumber,
-            Street = member.Address.Street,
-            City = member.Address.City
-        };
+        var updateDto = _mapper.Map<MemberToUpdateDto>(member);
 
         return Result<MemberToUpdateDto>.Success(updateDto);
     }
@@ -160,20 +99,13 @@ public class MemberService(
         if (member.Name != updateDto.Name)
             return Result.Failure("Member name not allowed to update.", ErrorType.Validation);
 
-        var email = updateDto.Email.Trim().ToLowerInvariant();
-        var phone = updateDto.Phone;
-
-        if (await _unitOfWork.Members.IsEmailTakenAsync(email, id, ct))
+        if (await _unitOfWork.Members.IsEmailTakenAsync(updateDto.Email, id, ct))
             return Result.Failure("Email is already taken.", ErrorType.Validation, nameof(updateDto.Email));
 
-        if (await _unitOfWork.Members.IsPhoneTakenAsync(phone, id, ct))
+        if (await _unitOfWork.Members.IsPhoneTakenAsync(updateDto.Phone, id, ct))
             return Result.Failure("Phone is already taken.", ErrorType.Validation, nameof(updateDto.Phone));
 
-        member.Email = email;
-        member.Phone = phone;
-        member.Address.BuildingNumber = updateDto.BuildingNumber.Trim();
-        member.Address.Street = updateDto.Street.Trim();
-        member.Address.City = updateDto.City.Trim();
+        _ = _mapper.Map(updateDto, member);
 
         var result = await _unitOfWork.CommitAsync(ct);
 
@@ -205,11 +137,7 @@ public class MemberService(
         if (member is null)
             return Result<MemberDeleteDto>.Failure("Member not found.", ErrorType.NotFound);
 
-        var activateDto = new MemberDeleteDto
-        {
-            Id = member.Id,
-            Name = member.Name
-        };
+        var activateDto = _mapper.Map<MemberDeleteDto>(member);
 
         return Result<MemberDeleteDto>.Success(activateDto);
     }

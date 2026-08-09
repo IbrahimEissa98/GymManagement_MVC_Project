@@ -1,4 +1,5 @@
-﻿using GymManagement_MVC_Project.BLL.Common;
+﻿using AutoMapper;
+using GymManagement_MVC_Project.BLL.Common;
 using GymManagement_MVC_Project.BLL.DTOs.Plan;
 using GymManagement_MVC_Project.BLL.Providers.Contracts;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
@@ -6,25 +7,18 @@ using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 
 namespace GymManagement_MVC_Project.BLL.Services;
 
-public class PlanService(IUnitOfWork unitOfWork, IDateTimeProvider clock) : IPlanService
+public class PlanService(IUnitOfWork unitOfWork, IDateTimeProvider clock, IMapper mapper) : IPlanService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IDateTimeProvider _clock = clock;
+    private readonly IMapper _mapper = mapper;
 
     public async Task<Result<IReadOnlyList<PlanIndexDto>>> GetAllAsync(CancellationToken ct = default)
     {
         var plans = await _unitOfWork.Plans.GetAllAsync(ct);
 
-        return Result<IReadOnlyList<PlanIndexDto>>.Success([..plans.Select(p => new PlanIndexDto
-        {
-            Id = p.Id,
-            Name = p.Name,
-            Price = p.Price,
-            Description = p.Description,
-            DurationDays = p.DurationDays,
-            IsActive = p.IsActive
-        })]);
-
+        return Result<IReadOnlyList<PlanIndexDto>>.Success(
+                    _mapper.Map<IReadOnlyList<PlanIndexDto>>(plans));
     }
 
     public async Task<Result<PlanIndexDto>> GetDetailsAsync(int id, CancellationToken ct = default)
@@ -33,15 +27,7 @@ public class PlanService(IUnitOfWork unitOfWork, IDateTimeProvider clock) : IPla
 
         if (plan is null) return Result<PlanIndexDto>.Failure("Plan not found.", ErrorType.NotFound);
 
-        var planDto = new PlanIndexDto
-        {
-            Id = plan.Id,
-            Name = plan.Name,
-            Price = plan.Price,
-            Description = plan.Description,
-            DurationDays = plan.DurationDays,
-            IsActive = plan.IsActive
-        };
+        var planDto = _mapper.Map<PlanIndexDto>(plan);
 
         return Result<PlanIndexDto>.Success(planDto);
     }
@@ -57,14 +43,7 @@ public class PlanService(IUnitOfWork unitOfWork, IDateTimeProvider clock) : IPla
         if (plan.Memberships.Any(m => m.EndDate > _clock.UtcNow))
             return Result<PlanEditDto>.Failure("Can not edit registered plan.", ErrorType.Conflict);
 
-        var editDto = new PlanEditDto
-        {
-            Name = plan.Name,
-            Price = plan.Price,
-            Description = plan.Description,
-            DurationDays = plan.DurationDays,
-            IsActive = plan.IsActive
-        };
+        var editDto = _mapper.Map<PlanEditDto>(plan);
 
         return Result<PlanEditDto>.Success(editDto);
     }
@@ -79,10 +58,16 @@ public class PlanService(IUnitOfWork unitOfWork, IDateTimeProvider clock) : IPla
             return Result.Failure("Can not edit inactive plan.", ErrorType.Conflict);
         if (plan.Memberships.Any(m => m.EndDate > _clock.UtcNow))
             return Result.Failure("Can not edit registered plan.", ErrorType.Conflict);
+        if (plan.Name != editDto.Name)
+            return Result.Failure("Can not edit plan name.", ErrorType.Validation);
 
-        plan.Price = editDto.Price;
-        plan.Description = editDto.Description;
-        plan.DurationDays = editDto.DurationDays;
+        //plan.Price = editDto.Price;
+        //plan.Description = editDto.Description;
+        //plan.DurationDays = editDto.DurationDays;
+
+        var editedPlan = _mapper.Map(editDto, plan);
+
+        //_unitOfWork.Plans.Update(editedPlan);
 
         var result = await _unitOfWork.CommitAsync(ct);
 
