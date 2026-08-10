@@ -1,4 +1,6 @@
-﻿using GymManagement_MVC_Project.BLL.DTOs.Trainer;
+﻿using GymManagement_MVC_Project.BLL.Common;
+using GymManagement_MVC_Project.BLL.DTOs.Trainer;
+using GymManagement_MVC_Project.BLL.Extensions.Mapping;
 using GymManagement_MVC_Project.BLL.Providers.Contracts;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.DAL.Models;
@@ -12,134 +14,94 @@ public class TrainerService(IUnitOfWork unitOfWork, IDateTimeProvider clock) : I
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IDateTimeProvider _clock = clock;
 
-    public async Task<IReadOnlyList<TrainerIndexDto>> GetAllAsync(CancellationToken ct = default)
+    public async Task<Result<IReadOnlyList<TrainerIndexDto>>> GetAllAsync(CancellationToken ct = default)
     {
         var trainers = await _unitOfWork.Trainers.GetAllIncludingDeletedAsync(ct);
 
-        return [..trainers.Select(t => new TrainerIndexDto {
-            Id = t.Id,
-            Name = t.Name,
-            Email = t.Email,
-            Phone =t.Phone,
-            Specialize = t.Specialties.ToString(),
-            IsDeleted = t.IsDeleted
-        })];
+        return Result<IReadOnlyList<TrainerIndexDto>>.Success
+            ([.. trainers.Select(t => t.GetTrainerIndexDto())]);
     }
 
-    public async Task<bool> CreateAsync(TrainerCreateDto createDto, CancellationToken ct = default)
+    public async Task<Result> CreateAsync(TrainerCreateDto createDto, CancellationToken ct = default)
     {
         var email = createDto.Email.Trim().ToLower();
         if (await _unitOfWork.Trainers.IsEmailTakenAsync(email, ct: ct))
-            return false;
+            return Result.Failure("Email is already exists.", ErrorType.Validation, nameof(createDto.Email));
 
         if (await _unitOfWork.Trainers.IsPhoneTakenAsync(createDto.Phone, ct: ct))
-            return false;
+            return Result.Failure("Phone is already exists.", ErrorType.Validation, nameof(createDto.Phone));
 
-        Enum.TryParse(createDto.Gender, true, out GenderTypes gender);
-        Enum.TryParse(createDto.Specialties, true, out TrainerSpecialties specialties);
+        if (!Enum.TryParse(createDto.Gender, true, out GenderTypes gender))
+            return Result.Failure("Gender not valid", ErrorType.NotFound, nameof(createDto.Gender));
 
-        var trainer = new Trainer
-        {
-            Name = createDto.Name,
-            Email = email,
-            Phone = createDto.Phone,
-            DateOfBirth = createDto.DateOfBirth,
-            Gender = gender,
-            Specialties = specialties,
-            Address = new Address
-            {
-                City = createDto.City,
-                Street = createDto.Street,
-                BuildingNumber = createDto.BuildingNumber,
-            },
-            HireDate = _clock.Today
-        };
+        if (!Enum.TryParse(createDto.Specialties, true, out TrainerSpecialties specialties))
+            return Result.Failure("Specialties not valid", ErrorType.NotFound, nameof(createDto.Specialties));
+
+        var trainer = createDto.GetCreateTrainer(_clock);
 
         await _unitOfWork.Trainers.AddAsync(trainer, ct);
 
         var result = await _unitOfWork.CommitAsync(ct);
 
-        return result > 0;
+        return result > 0
+            ? Result.Success()
+            : Result.Failure("Failed to create Trainer.", ErrorType.Failure);
     }
 
-    public async Task<TrainerDetailsDto?> GetDetailsAsync(int id, CancellationToken ct = default)
-    {
-        var trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
-
-        if (trainer is null) return null;
-
-        var address = string.Join(" - ", trainer.Address.BuildingNumber,
-                                                trainer.Address.Street,
-                                                trainer.Address.City);
-
-        var detailsDto = new TrainerDetailsDto
-        {
-            Name = trainer.Name,
-            Email = trainer.Email,
-            Phone = trainer.Phone,
-            Specialties = trainer.Specialties.ToString(),
-            DateOfBirth = trainer.DateOfBirth.ToShortDateString(),
-            Gender = trainer.Gender.ToString(),
-            Address = address
-        };
-
-        return detailsDto;
-    }
-
-    public async Task<TrainerEditDto?> GetForEditAsync(int id, CancellationToken ct = default)
-    {
-        var trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
-
-        if (trainer is null) return null;
-
-        var editDto = new TrainerEditDto
-        {
-            Name = trainer.Name,
-            Email = trainer.Email,
-            Phone = trainer.Phone,
-            BuildingNumber = trainer.Address.BuildingNumber,
-            Street = trainer.Address.Street,
-            City = trainer.Address.City,
-            Specialties = trainer.Specialties.ToString()
-        };
-
-        return editDto;
-    }
-
-    public async Task<bool> EditAsync(int id, TrainerEditDto editDto, CancellationToken ct = default)
+    public async Task<Result<TrainerDetailsDto>> GetDetailsAsync(int id, CancellationToken ct = default)
     {
         var trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
 
         if (trainer is null)
-            return false;
+            return Result<TrainerDetailsDto>.Failure("Trainer not found.", ErrorType.NotFound);
+
+        var detailsDto = trainer.GetTrainerDetailsDto();
+
+        return Result<TrainerDetailsDto>.Success(detailsDto);
+    }
+
+    public async Task<Result<TrainerEditDto>> GetForEditAsync(int id, CancellationToken ct = default)
+    {
+        var trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
+
+        if (trainer is null)
+            return Result<TrainerEditDto>.Failure("Trainer not found.", ErrorType.NotFound);
+
+        var editDto = trainer.GetTrainerEditDto();
+
+        return Result<TrainerEditDto>.Success(editDto);
+    }
+
+    public async Task<Result> EditAsync(int id, TrainerEditDto editDto, CancellationToken ct = default)
+    {
+        var trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
+
+        if (trainer is null)
+            return Result.Failure("Trainer not found", ErrorType.NotFound);
 
         if (trainer.Name != editDto.Name)
-            return false;
+            return Result.Failure("Can not update trainer name.", ErrorType.Validation);
 
         var email = editDto.Email.Trim().ToLowerInvariant();
-
         if (await _unitOfWork.Trainers.IsEmailTakenAsync(email, includeId: id, ct))
-            return false;
+            return Result.Failure("Email is already exists.", ErrorType.Validation, nameof(editDto.Email));
 
         if (await _unitOfWork.Trainers.IsPhoneTakenAsync(editDto.Phone, includeId: id, ct))
-            return false;
+            return Result.Failure("Phone is already exists.", ErrorType.Validation, nameof(editDto.Phone));
 
         if (!Enum.TryParse(editDto.Specialties, true, out TrainerSpecialties specialties))
-            return false;
+            return Result.Failure("Specialties not valid", ErrorType.Validation, nameof(editDto.Specialties));
 
-        trainer.Email = email;
-        trainer.Phone = editDto.Phone;
-        trainer.Address.BuildingNumber = editDto.BuildingNumber;
-        trainer.Address.Street = editDto.Street;
-        trainer.Address.City = editDto.City;
-        trainer.Specialties = specialties;
+        trainer.SetTrainerUpdates(editDto);
 
         var result = await _unitOfWork.CommitAsync(ct);
 
-        return result > 0;
+        return result > 0
+            ? Result.Success()
+            : Result.Failure("Failed to update trainer.", ErrorType.Failure);
     }
 
-    public async Task<TrainerDeleteDto?> GetForDeleteOrRestoreAsync(int id, bool IsDelete = true, CancellationToken ct = default)
+    public async Task<Result<TrainerDeleteDto>> GetForDeleteOrRestoreAsync(int id, bool IsDelete = true, CancellationToken ct = default)
     {
         Trainer? trainer;
         if (IsDelete)
@@ -148,7 +110,7 @@ public class TrainerService(IUnitOfWork unitOfWork, IDateTimeProvider clock) : I
             trainer = await _unitOfWork.Trainers.GetByIdIncludingDeletedAsync(id, ct);
 
         if (trainer is null)
-            return null;
+            return Result<TrainerDeleteDto>.Failure("Trainer not found.", ErrorType.NotFound);
 
         var deleteDto = new TrainerDeleteDto
         {
@@ -156,25 +118,27 @@ public class TrainerService(IUnitOfWork unitOfWork, IDateTimeProvider clock) : I
             Name = trainer.Name
         };
 
-        return deleteDto;
+        return Result<TrainerDeleteDto>.Success(deleteDto);
     }
 
-    public async Task<bool> DeleteAsync(int id, CancellationToken ct = default)
+    public async Task<Result> DeleteAsync(int id, CancellationToken ct = default)
     {
         var trainer = await _unitOfWork.Trainers.GetByIdAsync(id, ct);
 
         if (trainer is null)
-            return false;
+            return Result.Failure("Trainer not found.", ErrorType.NotFound);
 
         if (await _unitOfWork.Trainers.IsHasScheduledSessionsAsync(id, _clock.UtcNow, ct))
-            return false;
+            return Result.Failure("Can not deactivate Trainer with schedule sessions.", ErrorType.Failure);
 
         _unitOfWork.Trainers.Remove(trainer);
 
-        return (await _unitOfWork.CommitAsync(ct)) > 0;
+        return (await _unitOfWork.CommitAsync(ct)) > 0
+            ? Result.Success()
+            : Result.Failure("Failed to deactivate Trainer.", ErrorType.Failure);
     }
 
-    public async Task<bool> ActivateAsync(int id, CancellationToken ct = default)
+    public async Task<Result> ActivateAsync(int id, CancellationToken ct = default)
     {
         var trainer = await _unitOfWork.Trainers.GetByIdWithIncludesAsync
             (
@@ -185,7 +149,7 @@ public class TrainerService(IUnitOfWork unitOfWork, IDateTimeProvider clock) : I
             );
 
         if (trainer is null)
-            return false;
+            return Result.Failure("Trainer not found.", ErrorType.NotFound);
 
         trainer.IsDeleted = false;
         trainer.DeletedAt = null;
@@ -198,6 +162,8 @@ public class TrainerService(IUnitOfWork unitOfWork, IDateTimeProvider clock) : I
 
         _unitOfWork.Trainers.Update(trainer);
 
-        return (await _unitOfWork.CommitAsync(ct)) > 0;
+        return (await _unitOfWork.CommitAsync(ct)) > 0
+            ? Result.Success()
+            : Result.Failure("Failed to activate trainer.", ErrorType.Failure);
     }
 }

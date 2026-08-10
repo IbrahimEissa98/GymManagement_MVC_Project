@@ -57,7 +57,7 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
 
     public async Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> expression, CancellationToken ct = default)
     {
-        return await _dbSet.AnyAsync(expression, ct);
+        return await _dbSet.IgnoreQueryFilters().AnyAsync(expression, ct);
     }
 
     public async Task<IReadOnlyList<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, CancellationToken ct = default)

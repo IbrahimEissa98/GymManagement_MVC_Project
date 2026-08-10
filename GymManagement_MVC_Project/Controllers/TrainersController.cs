@@ -1,6 +1,5 @@
-﻿using GymManagement_MVC_Project.BLL.DTOs.Trainer;
-using GymManagement_MVC_Project.BLL.Services.Contracts;
-using GymManagement_MVC_Project.DAL.Models.Enums;
+﻿using GymManagement_MVC_Project.BLL.Services.Contracts;
+using GymManagement_MVC_Project.PL.Extensions.Mapping;
 using GymManagement_MVC_Project.PL.ViewModels.Trainer;
 using Microsoft.AspNetCore.Mvc;
 
@@ -15,15 +14,7 @@ public class TrainersController(ITrainerService trainerService) : Controller
     {
         var trainers = await _trainerService.GetAllAsync(ct);
 
-        IReadOnlyList<TrainerIndexViewModel> trainersViewModel = [..trainers.Select(t => new TrainerIndexViewModel
-        {
-            Id = t.Id,
-            Name = t.Name,
-            Email = t.Email,
-            Phone = t.Phone,
-            Specialize = t.Specialize,
-            IsDeleted = t.IsDeleted
-        })];
+        IReadOnlyList<TrainerIndexViewModel> trainersViewModel = [.. trainers.Value!.Select(t => t.GetTrainerIndexVM())];
 
         return View(trainersViewModel);
     }
@@ -40,25 +31,22 @@ public class TrainersController(ITrainerService trainerService) : Controller
     {
         if (!ModelState.IsValid) return View(createViewModel);
 
-        var createDto = new TrainerCreateDto
-        {
-            Name = createViewModel.Name,
-            Email = createViewModel.Email,
-            Phone = createViewModel.Phone,
-            DateOfBirth = createViewModel.DateOfBirth,
-            Gender = createViewModel.Gender,
-            Specialties = createViewModel.Specialties,
-            City = createViewModel.City,
-            Street = createViewModel.Street,
-            BuildingNumber = createViewModel.BuildingNumber
-        };
+        var createDto = createViewModel.GetTrainerCreateDto();
 
         var result = await _trainerService.CreateAsync(createDto, ct);
 
-        if (result)
+        if (result.IsSuccess)
             TempData["SuccessMessage"] = "Trainer Created Successfully";
         else
-            TempData["FailMessage"] = "Failed To Create Trainer";
+        {
+            if (result.ErrorKey is not null && result.Error is not null)
+            {
+                ModelState.AddModelError(result.ErrorKey, result.Error);
+                return View(createViewModel);
+            }
+            else
+                TempData["FailMessage"] = result.Error;
+        }
 
         return RedirectToAction(nameof(Index));
     }
@@ -68,19 +56,10 @@ public class TrainersController(ITrainerService trainerService) : Controller
     {
         var trainerDto = await _trainerService.GetDetailsAsync(id, ct);
 
-        if (trainerDto is null)
-            return NotFound();
+        if (!trainerDto.IsSuccess)
+            return NotFound(trainerDto.Error);
 
-        var detailsViewModel = new TrainerDetailsViewModel
-        {
-            Name = trainerDto.Name,
-            Email = trainerDto.Email,
-            Phone = trainerDto.Phone,
-            Specialties = trainerDto.Specialties.ToString(),
-            DateOfBirth = trainerDto.DateOfBirth,
-            Gender = trainerDto.Gender,
-            Address = trainerDto.Address
-        };
+        var detailsViewModel = trainerDto.Value!.GetTrainerDetailsVM();
 
         return View(detailsViewModel);
     }
@@ -90,22 +69,10 @@ public class TrainersController(ITrainerService trainerService) : Controller
     {
         var editDto = await _trainerService.GetForEditAsync(id, ct);
 
-        if (editDto is null)
-            return BadRequest();
+        if (!editDto.IsSuccess)
+            return BadRequest(editDto.Error);
 
-        if (!Enum.TryParse(editDto.Specialties, true, out TrainerSpecialties specialties))
-            ModelState.AddModelError("specialties", "Invalid specialties");
-
-        var editViewModel = new TrainerEditViewModel
-        {
-            Name = editDto.Name,
-            Email = editDto.Email,
-            Phone = editDto.Phone,
-            BuildingNumber = editDto.BuildingNumber,
-            Street = editDto.Street,
-            City = editDto.City,
-            Specialties = specialties
-        };
+        var editViewModel = editDto.Value!.GetTrainerEditVM();
 
         return View(editViewModel);
     }
@@ -117,23 +84,22 @@ public class TrainersController(ITrainerService trainerService) : Controller
         if (!ModelState.IsValid)
             return View(editViewModel);
 
-        var editDto = new TrainerEditDto
-        {
-            Name = editViewModel.Name,
-            Email = editViewModel.Email,
-            Phone = editViewModel.Phone,
-            BuildingNumber = editViewModel.BuildingNumber,
-            Street = editViewModel.Street,
-            City = editViewModel.City,
-            Specialties = editViewModel.Specialties.ToString()
-        };
+        var editDto = editViewModel.GetTrainerEditDto();
 
         var result = await _trainerService.EditAsync(id, editDto, ct);
 
-        if (result)
+        if (result.IsSuccess)
             TempData["SuccessMessage"] = "Trainer Updated Successfully";
         else
-            TempData["FailMessage"] = "Failed To Update Trainer";
+        {
+            if (result.ErrorKey is not null && result.Error is not null)
+            {
+                ModelState.AddModelError(result.ErrorKey, result.Error);
+                return View(editViewModel);
+            }
+            else
+                TempData["FailMessage"] = result.Error;
+        }
 
         return RedirectToAction(nameof(Index));
     }
@@ -143,14 +109,10 @@ public class TrainersController(ITrainerService trainerService) : Controller
     {
         var trainer = await _trainerService.GetForDeleteOrRestoreAsync(id, ct: ct);
 
-        if (trainer is null)
-            return NotFound();
+        if (!trainer.IsSuccess)
+            return NotFound(trainer.Error);
 
-        var deleteViewModel = new TrainerDeleteViewModel
-        {
-            Id = trainer.Id,
-            Name = trainer.Name
-        };
+        var deleteViewModel = trainer.Value!.GetTrainerDeleteVM();
 
         return View(deleteViewModel);
     }
@@ -161,10 +123,10 @@ public class TrainersController(ITrainerService trainerService) : Controller
     {
         var result = await _trainerService.DeleteAsync(id, ct);
 
-        if (result)
+        if (result.IsSuccess)
             TempData["SuccessMessage"] = "Trainer Deactivated Successfully";
         else
-            TempData["FailMessage"] = "Failed To Deactivate Trainer";
+            TempData["FailMessage"] = result.Error;
 
         return RedirectToAction(nameof(Index));
     }
@@ -174,14 +136,10 @@ public class TrainersController(ITrainerService trainerService) : Controller
     {
         var trainer = await _trainerService.GetForDeleteOrRestoreAsync(id, false, ct: ct);
 
-        if (trainer is null)
-            return NotFound();
+        if (!trainer.IsSuccess)
+            return NotFound(trainer.Error);
 
-        var deleteViewModel = new TrainerDeleteViewModel
-        {
-            Id = trainer.Id,
-            Name = trainer.Name
-        };
+        var deleteViewModel = trainer.Value!.GetTrainerDeleteVM();
 
         return View(deleteViewModel);
     }
@@ -192,10 +150,10 @@ public class TrainersController(ITrainerService trainerService) : Controller
     {
         var result = await _trainerService.ActivateAsync(id, ct);
 
-        if (result)
+        if (result.IsSuccess)
             TempData["SuccessMessage"] = "Trainer Activated Successfully";
         else
-            TempData["FailMessage"] = "Failed To Activate Trainer";
+            TempData["FailMessage"] = result.Error;
 
         return RedirectToAction(nameof(Index));
     }
