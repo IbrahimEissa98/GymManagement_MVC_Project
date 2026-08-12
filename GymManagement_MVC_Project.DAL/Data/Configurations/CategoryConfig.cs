@@ -11,5 +11,10 @@ internal class CategoryConfig : IEntityTypeConfiguration<Category>
         builder.Property(c => c.Name)
                 .HasColumnType("VarChar")
                 .HasMaxLength(20);
+
+        builder.Property(c => c.Specialties)
+                .HasConversion<string>()
+                .HasColumnType("VarChar")
+                .HasMaxLength(20);
     }
 }

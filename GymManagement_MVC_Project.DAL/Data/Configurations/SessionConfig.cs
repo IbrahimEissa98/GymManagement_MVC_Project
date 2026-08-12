@@ -15,7 +15,7 @@ internal class SessionConfig : IEntityTypeConfiguration<Session>
         builder.ToTable(t =>
         {
             t.HasCheckConstraint("CK_Session_Capacity", "Capacity between 1 and 25");
-            t.HasCheckConstraint("CK_Session_StartDate", "StartDate > GetDate()");
+            //t.HasCheckConstraint("CK_Session_StartDate", "StartDate > SYSUTCDATETIME()");
             t.HasCheckConstraint("CK_Session_EndDate", "EndDate > StartDate");
         });
     }

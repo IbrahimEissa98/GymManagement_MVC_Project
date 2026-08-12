@@ -1,0 +1,198 @@
+﻿@model SessionEditViewModel
+
+@{
+	ViewData["Title"] = "Edit Session";
+}
+
+@section Styles {
+	<partial name="_BootstrapValidationClassesStylePartial" />
+}
+
+<div class="container pt-5">
+
+	<nav class="breadcrumb-nav mb-3 pt-5" aria-label="Breadcrumb">
+		<a asp-controller="Sessions" asp-action="Index">
+			<i class="bi bi-calendar-event me-1"></i>Training Sessions
+		</a>
+		<span class="separator">/</span>
+		<span class="text-muted">Edit Session</span>
+	</nav>
+
+	<div class="row justify-content-center">
+
+		<div class="col-lg-10">
+
+			<div class="card plan-detail-card border-0">
+
+				<div class="card-header text-white text-center">
+					<i class="bi bi-pencil-square display-4 mb-3 d-block"></i>
+
+					<h2 class="fw-bold mb-2">
+						Edit Session
+					</h2>
+
+					<p class="mb-0 opacity-75">
+						Update session information
+					</p>
+				</div>
+
+				<form asp-action="Edit" method="post">
+
+					<input asp-for="CategoryId" type="hidden" />
+
+					<div class="card-body">
+
+						<!-- Session Information -->
+
+						<div class="detail-item mb-4">
+
+							<h5 class="fw-bold text-primary-color mb-4">
+								<i class="bi bi-info-circle me-2"></i>
+								Session Information
+							</h5>
+
+							<div class="row g-3">
+
+								<div class="col-12 col-md-6">
+
+									<label asp-for="TrainerId"
+										   class="form-label fw-semibold">
+										Trainer
+										<span class="text-danger">*</span>
+									</label>
+
+									<select asp-for="TrainerId"
+											asp-items="new SelectList(Model.Trainers,
+											nameof(TrainerLookupItem.Id),
+											nameof(TrainerLookupItem.Name))"
+											class="form-select">
+
+										<option value="">
+											Select Trainer
+										</option>
+
+									</select>
+
+									<span asp-validation-for="TrainerId"
+										  class="text-danger"></span>
+
+								</div>
+
+
+								<div class="col-12">
+
+									<label asp-for="Description"
+										   class="form-label fw-semibold">
+										Description
+										<span class="text-danger">*</span>
+									</label>
+
+									<textarea asp-for="Description"
+											  class="form-control"
+											  rows="4"
+											  placeholder="Describe the session content and objectives..."></textarea>
+
+									<span asp-validation-for="Description"
+										  class="text-danger"></span>
+
+								</div>
+
+							</div>
+
+						</div>
+
+
+						<!-- Date & Time -->
+
+						<div class="detail-item">
+
+							<h5 class="fw-bold text-primary-color mb-4">
+								<i class="bi bi-clock me-2"></i>
+								Date & Time
+							</h5>
+
+							<div class="row g-3">
+
+								<div class="col-12 col-md-6">
+
+									<label asp-for="StartDate"
+										   class="form-label fw-semibold">
+										Start Date & Time
+										<span class="text-danger">*</span>
+									</label>
+
+									<input asp-for="StartDate"
+										   type="datetime-local"
+										   class="form-control" />
+
+									<span asp-validation-for="StartDate"
+										  class="text-danger"></span>
+
+								</div>
+
+
+								<div class="col-12 col-md-6">
+
+									<label asp-for="EndDate"
+										   class="form-label fw-semibold">
+										End Date & Time
+										<span class="text-danger">*</span>
+									</label>
+
+									<input asp-for="EndDate"
+										   type="datetime-local"
+										   class="form-control" />
+
+									<span asp-validation-for="EndDate"
+										  class="text-danger"></span>
+
+								</div>
+
+							</div>
+
+						</div>
+
+					</div>
+
+
+					<!-- Footer -->
+
+					<div class="card-footer">
+
+						<div class="d-flex gap-2">
+
+							<a asp-action="Index"
+							   class="btn btn-outline flex-fill">
+
+								<i class="bi bi-arrow-left me-1"></i>
+								Cancel
+
+							</a>
+
+							<button type="submit"
+									class="btn get-started flex-fill">
+
+								<i class="bi bi-check-lg me-1"></i>
+								Update Session
+
+							</button>
+
+						</div>
+
+					</div>
+
+				</form>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+	<partial name="_AlertDismissScript" />
+	<partial name="_DateTimeCheckScriptPartial" />
+}

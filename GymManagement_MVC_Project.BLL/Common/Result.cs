@@ -13,6 +13,7 @@ public interface IResult
 public class Result : IResult
 {
     public bool IsSuccess { get; }
+    public bool IsFailure => !IsSuccess;
     public string? Error { get; }
     public ErrorType? ErrorType { get; }
     public string? ErrorKey { get; }

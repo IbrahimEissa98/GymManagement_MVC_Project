@@ -22,7 +22,7 @@ public class MemberDtoProfile : Profile
                 Street = m.Street,
                 City = m.City
             }))
-            .ForMember(d => d.JoinDate, s => s.MapFrom(m => DateOnly.FromDateTime(DateTime.Now)));
+            .ForMember(d => d.JoinDate, s => s.MapFrom(m => DateOnly.FromDateTime(DateTime.UtcNow)));
 
         CreateMap<Member, MemberDetailsDto>()
             .ForMember(d => d.PhotoUrl, s => s.MapFrom(s => s.Photo))

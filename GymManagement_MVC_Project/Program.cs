@@ -3,6 +3,7 @@ using GymManagement_MVC_Project.BLL.Profiles;
 using GymManagement_MVC_Project.DAL;
 using GymManagement_MVC_Project.DAL.Data.Contexts;
 using GymManagement_MVC_Project.DAL.Data.Seeder;
+using GymManagement_MVC_Project.PL.Helper;
 using GymManagement_MVC_Project.PL.Profiles;
 using Microsoft.EntityFrameworkCore;
 
@@ -18,7 +19,11 @@ var autoMapperLicenseKey = builder.Configuration.GetSection("AutoMapper:LicenseK
         ?? throw new InvalidOperationException("The AutoMapper License Key not found");
 
 builder.Services.AddGymDataAccess(connectionString);
-builder.Services.AddGymBusinessLogic(autoMapperLicenseKey);
+builder.Services.AddGymBusinessLogic();
+
+builder.Services.AddHttpContextAccessor();
+
+builder.Services.AddScoped<IUserTimeZoneService, UserTimeZoneService>();
 
 
 builder.Services.AddAutoMapper(config =>

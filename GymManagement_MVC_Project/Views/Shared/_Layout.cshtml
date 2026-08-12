@@ -18,6 +18,13 @@
         document.documentElement.setAttribute('data-bs-theme', t);
         })();
     </script> 
+    <script>
+            const timeZone = Intl.DateTimeFormat().resolvedOptions().timeZone;
+
+            document.cookie =
+            "TimeZone=" + encodeURIComponent(timeZone) +
+            "; path=/; max-age=31536000; SameSite=Lax";
+    </script>
     <style>
         html, body {
         background-color: #f8f9fc;
@@ -78,7 +85,7 @@
                             <a class="nav-link @ActiveTap("Trainers")" asp-controller="Trainers" asp-action="Index">Trainers</a>
                         </li>
                         <li class="nav-item">
-							<a class="nav-link @ActiveTap("Sessions")" href="#">Sessions</a>
+							<a class="nav-link @ActiveTap("Sessions")" asp-controller="Sessions" asp-action="Index">Sessions</a>
                         </li>
                         <li class="nav-item">
 							<a class="nav-link @ActiveTap("Plans")" asp-controller="Plans" asp-action="Index">Plans</a>
@@ -113,6 +120,7 @@
             &copy; 2026 - GymManagementProject - <a asp-area="" asp-controller="Home" asp-action="Privacy">Privacy</a>
         </div>
     </footer> *@
+    
     <script src="~/lib/jquery/dist/jquery.min.js"></script>
     <script src="~/lib/bootstrap/dist/js/bootstrap.bundle.min.js"></script>
     <script src="~/js/theme.js" asp-append-version="true"></script>
