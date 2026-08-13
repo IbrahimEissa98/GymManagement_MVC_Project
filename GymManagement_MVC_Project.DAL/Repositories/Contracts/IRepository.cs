@@ -15,6 +15,7 @@ public interface IRepository<TEntity> where TEntity : BaseEntity
     Task<TEntity?> GetByIdIncludingDeletedAsync(int id, CancellationToken ct = default);
     Task<IReadOnlyList<TEntity>> FindAsync(Expression<Func<TEntity, bool>> expression, CancellationToken ct = default);
     Task<bool> ExistsAsync(Expression<Func<TEntity, bool>> expression, CancellationToken ct = default);
+    Task<int> GetCountAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken ct = default);
     Task AddAsync(TEntity entity, CancellationToken ct = default);
     void Update(TEntity entity);
     void Remove(TEntity entity);

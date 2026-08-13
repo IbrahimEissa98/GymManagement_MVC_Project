@@ -65,6 +65,14 @@ public class Repository<TEntity> : IRepository<TEntity> where TEntity : BaseEnti
         return await _dbSet.Where(expression).ToListAsync(ct);
     }
 
+    public async Task<int> GetCountAsync(Expression<Func<TEntity, bool>>? predicate = null, CancellationToken ct = default)
+    {
+        var query = _dbSet.AsNoTracking().IgnoreQueryFilters();
+        if (predicate is not null)
+            query = query.Where(predicate);
+        return await query.CountAsync(ct);
+    }
+
     public async Task AddAsync(TEntity entity, CancellationToken ct = default)
     {
         await _dbSet.AddAsync(entity, ct);

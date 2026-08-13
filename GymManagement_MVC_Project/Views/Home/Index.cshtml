@@ -1,4 +1,7 @@
-﻿@{
+﻿@using GymManagement_MVC_Project.PL.ViewModels
+@model HomeAnalyticsViewModel
+
+@{
     ViewData["Title"] = "Home";
 }
 
@@ -20,37 +23,37 @@
                     <div class="row g-3 mb-4">
                         <div class="col-4">
                             <div class="stat-card">
-                                <span class="stat-number d-block">100</span>
+                                <span class="stat-number d-block">@Model.TotalMembers</span>
                                 <p class="stat-label">Total Members</p>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="stat-card">
-                                <span class="stat-number d-block">85</span>
+                                <span class="stat-number d-block">@Model.ActiveMembers</span>
                                 <p class="stat-label">Active Members</p>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="stat-card">
-                                <span class="stat-number d-block">20</span>
+                                <span class="stat-number d-block">@Model.TotalTrainers</span>
                                 <p class="stat-label">Trainers</p>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="stat-card">
-                                <span class="stat-number d-block">3</span>
+                                <span class="stat-number d-block">@Model.UpcomingSessions</span>
                                 <p class="stat-label">Upcoming Sessions</p>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="stat-card">
-                                <span class="stat-number d-block">5</span>
+                                <span class="stat-number d-block">@Model.OngoingSessions</span>
                                 <p class="stat-label">Ongoing Sessions</p>
                             </div>
                         </div>
                         <div class="col-4">
                             <div class="stat-card">
-                                <span class="stat-number d-block">20</span>
+                                <span class="stat-number d-block">@Model.CompletedSessions</span>
                                 <p class="stat-label">Completed Sessions</p>
                             </div>
                         </div>

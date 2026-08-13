@@ -66,9 +66,9 @@ public class SessionService(
         if (trainer is null)
             return Result.Failure("Selected Trainer is invalid", ErrorType.Validation, nameof(createDto.TrainerId));
 
-        if (createDto.EndDate < createDto.StartDate)
+        if (createDto.EndDate <= createDto.StartDate)
             return Result.Failure("End date must be after start date", ErrorType.Validation, nameof(createDto.EndDate));
-        if (createDto.StartDate < _clock.UtcNow)
+        if (createDto.StartDate <= _clock.UtcNow)
             return Result.Failure("Start date must be in the future.", ErrorType.Validation, nameof(createDto.StartDate));
         if (createDto.Capacity > 25 || createDto.Capacity < 0)
             return Result.Failure("Capacity must be between 1 and 25", ErrorType.Validation, nameof(createDto.Capacity));
