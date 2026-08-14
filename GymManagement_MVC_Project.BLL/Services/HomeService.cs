@@ -16,7 +16,12 @@ internal class HomeService(
     public async Task<Result<HomeAnalyticsDto>> GetAnalyticsAsync(CancellationToken ct = default)
     {
         var totalMembers = await _unitOfWork.Members.GetCountAsync(ct: ct);
-        var activeMembers = await _unitOfWork.Members.GetCountAsync(m => m.Memberships.Any(ms => ms.StartDate < _clock.UtcNow && ms.EndDate > _clock.UtcNow), ct: ct);
+        var activeMembers = await _unitOfWork.Members
+                        .GetCountAsync(m => m.Memberships
+                            .Any(ms => ms.StartDate < _clock.UtcNow
+                                                && ms.EndDate > _clock.UtcNow
+                                                && ms.IsDeleted == false)
+                        , ct: ct);
         var totalTrainers = await _unitOfWork.Trainers.GetCountAsync(ct: ct);
         var upcomingSessions = await _unitOfWork.Sessions.GetCountAsync(s => s.StartDate > _clock.UtcNow, ct: ct);
         var ongoingSessions = await _unitOfWork.Sessions.GetCountAsync(s => s.StartDate <= _clock.UtcNow && s.EndDate > _clock.UtcNow, ct: ct);

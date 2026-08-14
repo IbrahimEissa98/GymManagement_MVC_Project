@@ -1,5 +1,7 @@
 ﻿using GymManagement_MVC_Project.DAL.Data.Contexts;
 using GymManagement_MVC_Project.DAL.Models.Interceptors;
+using GymManagement_MVC_Project.DAL.Queries;
+using GymManagement_MVC_Project.DAL.Queries.Contracts;
 using GymManagement_MVC_Project.DAL.Repositories;
 using GymManagement_MVC_Project.DAL.Repositories.Contracts;
 using Microsoft.EntityFrameworkCore;
@@ -16,6 +18,9 @@ public static class ServiceCollectionExtensions
         services.AddScoped(typeof(IRepository<>), typeof(Repository<>));
 
         services.AddSingleton<TimestampInterceptor>();
+
+        services.AddScoped<ISessionQueryService, SessionQueryService>();
+        services.AddScoped<IMembershipQueryService, MembershipQueryService>();
 
         services.AddDbContext<GymDbContext>((sp, options) =>
         {

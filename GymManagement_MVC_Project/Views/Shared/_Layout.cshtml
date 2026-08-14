@@ -91,10 +91,10 @@
 							<a class="nav-link @ActiveTap("Plans")" asp-controller="Plans" asp-action="Index">Plans</a>
                         </li>
                         <li class="nav-item">
-							<a class="nav-link @ActiveTap("Memberships")" href="#">Memberships</a>
+							<a class="nav-link @ActiveTap("Memberships")" asp-controller="Memberships" asp-action="Index">Memberships</a>
                         </li>
                         <li class="nav-item">
-							<a class="nav-link @ActiveTap("SessionsSchedule")" href="#">Sessions Schedule</a>
+                            <a class="nav-link @ActiveTap("SessionsSchedule")" asp-controller="Bookings" asp-action="Index">Bookings</a>
                         </li>
                         <li class="nav-item">
                             <form asp-action="Logout" asp-controller="Account" method="post" class="d-inline">

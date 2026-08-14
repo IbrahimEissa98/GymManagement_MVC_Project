@@ -1,0 +1,27 @@
+﻿using Microsoft.EntityFrameworkCore.Migrations;
+
+#nullable disable
+
+namespace GymManagement_MVC_Project.Data.Migrations
+{
+    /// <inheritdoc />
+    public partial class RemoveStartDateConstraintAtMemberships : Migration
+    {
+        /// <inheritdoc />
+        protected override void Up(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.DropCheckConstraint(
+                name: "CK_Membership_StartDate",
+                table: "Memberships");
+        }
+
+        /// <inheritdoc />
+        protected override void Down(MigrationBuilder migrationBuilder)
+        {
+            migrationBuilder.AddCheckConstraint(
+                name: "CK_Membership_StartDate",
+                table: "Memberships",
+                sql: "StartDate >= GetDate()");
+        }
+    }
+}

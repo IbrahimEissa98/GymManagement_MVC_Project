@@ -1,4 +1,6 @@
-﻿namespace GymManagement_MVC_Project.DAL.Models;
+﻿using GymManagement_MVC_Project.DAL.Models.Enums;
+
+namespace GymManagement_MVC_Project.DAL.Models;
 
 public class Membership : BaseEntity
 {
@@ -9,4 +11,9 @@ public class Membership : BaseEntity
 
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
+
+    public MembershipStatus Status()
+    {
+        return EndDate > DateTime.UtcNow ? MembershipStatus.Active : MembershipStatus.Expired;
+    }
 }
