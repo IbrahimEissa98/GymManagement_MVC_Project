@@ -9,4 +9,10 @@ public static class DatabaseSeeder
         await PlanSeeder.SeedPlansAsync(dbContext);
         await CategorySeeder.SeedCategoriesAsync(dbContext);
     }
+
+    public static async Task SeedAllJsonAsync(GymDbContext dbContext)
+    {
+        await PlanSeeder.SeedPlansFromJsonAsync(dbContext);
+        await CategorySeeder.SeedCategoriesAsync(dbContext);
+    }
 }

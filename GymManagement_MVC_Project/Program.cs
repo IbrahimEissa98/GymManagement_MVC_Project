@@ -58,15 +58,16 @@ app.MapControllerRoute(
     pattern: "{controller=Home}/{action=Index}/{id?}")
     .WithStaticAssets();
 
+await using var scope = app.Services.CreateAsyncScope();
+var dbContext = scope.ServiceProvider.GetRequiredService<GymDbContext>();
 if (app.Environment.IsDevelopment())
 {
-    await using var scope = app.Services.CreateAsyncScope();
-    var dbContext = scope.ServiceProvider.GetRequiredService<GymDbContext>();
-
-    //if(await dbContext.Database.GetPendingMigrationsAsync() is not null)
-    //    await dbContext.Database.MigrateAsync();
-
+    await dbContext.Database.MigrateAsync();
     await DatabaseSeeder.SeedAllAsync(dbContext);
+}
+else
+{
+    await DatabaseSeeder.SeedAllJsonAsync(dbContext);
 }
 
 app.Run();
