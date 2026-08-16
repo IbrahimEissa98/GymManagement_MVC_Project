@@ -1,0 +1,120 @@
+﻿@model BookingViewMembersViewModel
+
+@{
+	ViewData["Title"] = "Session Bookings";
+}
+
+<div class="container pt-5">
+	<main role="main" class="pb-3 pt-5">
+		<partial name="_TempDataAlertMessage" />
+
+		<nav class="breadcrumb-nav mb-3" aria-label="Breadcrumb">
+			<a asp-controller="Bookings" asp-action="Index">
+				<i class="bi bi-calendar-event me-1"></i>Bookings
+			</a>
+			<span class="separator">/</span>
+			<span class="text-muted">Session Members</span>
+		</nav>
+
+		<!-- Header -->
+		<header class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mt-3">
+			<div class="d-flex align-items-center gap-3">
+				<div class="page-icon">
+					<i class="bi bi-person-lines-fill"></i>
+				</div>
+				<div>
+					<h2 class="text-primary-color mb-1 fw-bold">Session Attendance</h2>
+					<p class="text-muted mb-0">
+						<strong>Session: </strong>@Model.SessionDetails.CategoryName
+						<br />
+						<strong>Trainer: </strong>@Model.SessionDetails.TrainerName
+						<br />
+						<strong>StartDate: </strong>@Model.SessionDetails.StartDate
+					</p>
+				</div>
+			</div>
+		</header>
+
+		<!-- Memberships -->
+		<div class="card plan-detail-card border-0 overflow-visible">
+			<div class="card-header py-2 d-flex justify-content-between align-items-center">
+
+				<h5 class="mb-0 text-white">
+					<i class="bi bi-person-workspace me-2"></i>
+					Bookings  (@Model.SessionMembers.Count / @Model.SessionDetails.Capacity)
+				</h5>
+
+				<span class="badge bg-light text-dark">
+					@Model.SessionMembers.Count Booking(s)
+				</span>
+
+			</div>
+
+			@if (Model.SessionMembers.Any() && Model.SessionMembers != null)
+			{
+				<div class="table-responsive" style="overflow: visible;">
+					<table class="table align-middle mb-0">
+						<thead>
+							<tr>
+								<th class="text-center">
+									<i class="bi bi-person-fill text-center text-primary-color me-1"></i>
+									<span>Member</span>
+								</th>
+								<th class="text-center">
+									<span>Action</span>
+								</th>
+							</tr>
+						</thead>
+						<tbody>
+							@foreach (var item in Model.SessionMembers)
+							{
+								<tr class="align-middle">
+									<td class="text-center px-4">
+										<span>@item.MemberName</span>
+									</td>
+									<td class="text-center px-4">
+										@if (!item.IsAttended)
+										{
+											<form asp-action="Attend"
+												  asp-route-id="@Model.SessionDetails.SessionId"
+												  asp-route-bookingId="@item.Id"
+												method="post" class="m-0">
+												<button type="submit"
+														class="btn btn-outline-success">
+													<i class="bi bi-check-circle"></i>
+													Mark As Attended
+												</button>
+											</form>
+										}
+										else
+										{
+											<span class="text-success">
+												<i class="bi bi-check-circle-fill"></i>
+												Attended
+											</span>
+										}
+									</td>
+								</tr>
+							}
+
+						</tbody>
+					</table>
+				</div>
+			}
+			else
+			{
+				<div class="text-center py-5">
+					<i class="bi bi-card-checklist display-1 text-muted"></i>
+					<h4 class="mt-3 text-muted">No Active Bookings Available</h4>
+					<p class="text-muted mb-0">Create a new booking to get started.</p>
+				</div>
+			}
+			<a asp-controller="Bookings" asp-action="Index" class="btn btn-fill mt-3">Back to List</a>
+		</div>
+
+	</main>
+</div>
+
+@section Scripts {
+	<partial name="_AlertDismissScript" />
+}

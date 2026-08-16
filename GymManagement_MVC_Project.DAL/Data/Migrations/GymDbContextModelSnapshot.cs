@@ -64,7 +64,7 @@ namespace GymManagement_MVC_Project.Data.Migrations
                         .IsUnique()
                         .HasFilter("IsDeleted = 0");
 
-                    b.ToTable("Bookings");
+                    b.ToTable("Bookings", (string)null);
                 });
 
             modelBuilder.Entity("GymManagement_MVC_Project.DAL.Models.Category", b =>
@@ -98,7 +98,7 @@ namespace GymManagement_MVC_Project.Data.Migrations
 
                     b.HasKey("Id");
 
-                    b.ToTable("Categories");
+                    b.ToTable("Categories", (string)null);
                 });
 
             modelBuilder.Entity("GymManagement_MVC_Project.DAL.Models.HealthRecord", b =>
@@ -146,7 +146,7 @@ namespace GymManagement_MVC_Project.Data.Migrations
                     b.HasIndex("MemberId")
                         .IsUnique();
 
-                    b.ToTable("HealthRecords", t =>
+                    b.ToTable("HealthRecords", null, t =>
                         {
                             t.HasCheckConstraint("CK_HealthRecord_Height", "Height > 0");
 
@@ -213,7 +213,7 @@ namespace GymManagement_MVC_Project.Data.Migrations
                         .IsUnique()
                         .HasFilter("ISDeleted = 0");
 
-                    b.ToTable("Members", t =>
+                    b.ToTable("Members", null, t =>
                         {
                             t.HasCheckConstraint("CK_DateOfBirth", "DateOfBirth <= DateAdd(Year, -2, GetDate()) And DateOfBirth >= DateAdd(Year, -100, GetDate())");
 
@@ -261,7 +261,7 @@ namespace GymManagement_MVC_Project.Data.Migrations
 
                     b.HasIndex("PlanId");
 
-                    b.ToTable("Memberships", t =>
+                    b.ToTable("Memberships", null, t =>
                         {
                             t.HasCheckConstraint("CK_Membership_EndDate", "EndDate > StartDate");
                         });
@@ -312,7 +312,7 @@ namespace GymManagement_MVC_Project.Data.Migrations
                     b.HasIndex("Name")
                         .IsUnique();
 
-                    b.ToTable("Plans", t =>
+                    b.ToTable("Plans", null, t =>
                         {
                             t.HasCheckConstraint("Ck_PlanDuration", "DurationDays Between 1 And 365");
                         });
@@ -364,7 +364,7 @@ namespace GymManagement_MVC_Project.Data.Migrations
 
                     b.HasIndex("TrainerId");
 
-                    b.ToTable("Sessions", t =>
+                    b.ToTable("Sessions", null, t =>
                         {
                             t.HasCheckConstraint("CK_Session_Capacity", "Capacity between 1 and 25");
 
@@ -433,7 +433,7 @@ namespace GymManagement_MVC_Project.Data.Migrations
                         .IsUnique()
                         .HasFilter("ISDeleted = 0");
 
-                    b.ToTable("Trainers", t =>
+                    b.ToTable("Trainers", null, t =>
                         {
                             t.HasCheckConstraint("CK_DateOfBirth", "DateOfBirth <= DateAdd(Year, -2, GetDate()) And DateOfBirth >= DateAdd(Year, -100, GetDate())")
                                 .HasName("CK_DateOfBirth1");
@@ -503,7 +503,7 @@ namespace GymManagement_MVC_Project.Data.Migrations
 
                             b1.HasKey("MemberId");
 
-                            b1.ToTable("Members");
+                            b1.ToTable("Members", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("MemberId");
@@ -578,7 +578,7 @@ namespace GymManagement_MVC_Project.Data.Migrations
 
                             b1.HasKey("TrainerId");
 
-                            b1.ToTable("Trainers");
+                            b1.ToTable("Trainers", (string)null);
 
                             b1.WithOwner()
                                 .HasForeignKey("TrainerId");

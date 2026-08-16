@@ -21,6 +21,7 @@ public static class ServiceCollectionExtensions
 
         services.AddScoped<ISessionQueryService, SessionQueryService>();
         services.AddScoped<IMembershipQueryService, MembershipQueryService>();
+        services.AddScoped<IBookingQueryService, BookingQueryService>();
 
         services.AddDbContext<GymDbContext>((sp, options) =>
         {

@@ -87,7 +87,7 @@ public class MembershipService(
         var membership = await _unitOfWork.Memberships.GetByIdAsync(id, ct);
         if (membership is null)
             return Result.Failure("Membership not found", ErrorType.NotFound);
-        if (membership.Status() == MembershipStatus.Expired)
+        if (membership.Status == MembershipStatus.Expired)
             return Result.Failure("Can not cancel Expired membership.", ErrorType.Failure);
 
         try

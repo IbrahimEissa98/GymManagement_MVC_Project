@@ -16,6 +16,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ITrainerService, TrainerService>();
         services.AddScoped<ISessionService, SessionService>();
         services.AddScoped<IMembershipService, MembershipService>();
+        services.AddScoped<IBookingService, BookingService>();
 
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 

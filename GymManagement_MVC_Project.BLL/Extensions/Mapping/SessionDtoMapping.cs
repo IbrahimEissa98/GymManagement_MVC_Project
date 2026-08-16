@@ -49,7 +49,7 @@ public static class SessionDtoMapping
         };
     }
 
-    private static SessionStatus GetSessionStatus(DateTime startDate, DateTime endDate)
+    internal static SessionStatus GetSessionStatus(DateTime startDate, DateTime endDate)
     {
         if (startDate > DateTime.UtcNow)
             return SessionStatus.Upcoming;

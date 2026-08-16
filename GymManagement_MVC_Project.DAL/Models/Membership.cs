@@ -12,8 +12,5 @@ public class Membership : BaseEntity
     public DateTime StartDate { get; set; }
     public DateTime EndDate { get; set; }
 
-    public MembershipStatus Status()
-    {
-        return EndDate > DateTime.UtcNow ? MembershipStatus.Active : MembershipStatus.Expired;
-    }
+    public MembershipStatus Status => EndDate > DateTime.UtcNow && IsDeleted == false ? MembershipStatus.Active : MembershipStatus.Expired;
 }
