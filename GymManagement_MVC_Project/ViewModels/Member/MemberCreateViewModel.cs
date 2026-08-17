@@ -7,6 +7,8 @@ namespace GymManagement_MVC_Project.PL.ViewModels.Member;
 
 public class MemberCreateViewModel
 {
+    public IFormFile? PhotoFile { get; set; }
+
     [Required(ErrorMessage = "Name Is Required")]
     [RegularExpression(@"^[a-zA-Z\s]+$", ErrorMessage = "Name can only contain letters and spaces")]
     public string Name { get; set; } = default!;

@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GymManagement_MVC_Project.BLL.Attachments;
 using GymManagement_MVC_Project.BLL.Common;
 using GymManagement_MVC_Project.BLL.DTOs.HealthRecord;
 using GymManagement_MVC_Project.BLL.DTOs.Member;
@@ -13,12 +14,14 @@ namespace GymManagement_MVC_Project.BLL.Services;
 public class MemberService(
     IUnitOfWork unitOfWork,
     IDateTimeProvider clock,
-    IMapper mapper
+    IMapper mapper,
+    IAttachmentService attachmentService
     ) : IMemberService
 {
     private readonly IUnitOfWork _unitOfWork = unitOfWork;
     private readonly IDateTimeProvider _clock = clock;
     private readonly IMapper _mapper = mapper;
+    private readonly IAttachmentService _attachmentService = attachmentService;
 
     public async Task<Result<IReadOnlyList<MemberIndexDto>>> GetAllAsync(CancellationToken ct)
     {
@@ -34,23 +37,41 @@ public class MemberService(
         if (await _unitOfWork.Members.IsEmailTakenAsync(email, ct: ct))
             return Result.Failure("Email is already taken.", ErrorType.Validation, nameof(createDto.Email));
 
-        var phone = createDto.Phone.Trim().ToLower();
         if (await _unitOfWork.Members.IsPhoneTakenAsync(createDto.Phone, ct: ct))
             return Result.Failure("Phone is already taken.", ErrorType.Validation, nameof(createDto.Phone));
 
         if (!Enum.TryParse(createDto.Gender, true, out GenderTypes gender))
-            return Result.Failure("Gender not valid", ErrorType.NotFound, nameof(createDto.Gender));
+            return Result.Failure("Gender not valid", ErrorType.Validation, nameof(createDto.Gender));
 
         if (!Enum.TryParse(createDto.HealthRecord.BloodType, true, out BloodTypes bloodType))
-            return Result.Failure("Blood Type not valid", ErrorType.NotFound, nameof(createDto.HealthRecord.BloodType));
+            return Result.Failure("Blood Type not valid", ErrorType.Validation, nameof(createDto.HealthRecord.BloodType));
 
         var member = _mapper.Map<Member>(createDto);
+
+        if (createDto.PhotoFile is not null && createDto.PhotoFile?.Length > 0)
+        {
+            var saveImage = await _attachmentService.SaveAsync(createDto.PhotoFile, AttachmentsCategories.Members, ct);
+            if (saveImage.IsFailure)
+                return Result.Failure(saveImage.Error ?? "Invalid profile photo.", ErrorType.Validation, nameof(createDto.PhotoFile));
+            member.Photo = saveImage.Value;
+        }
 
         await _unitOfWork.Members.AddAsync(member, ct);
 
         var result = await _unitOfWork.CommitAsync(ct);
 
-        return result > 0 ? Result.Success() : Result.Failure("Failed to create member.", ErrorType.Failure);
+        if (result > 0)
+        {
+            return Result.Success();
+        }
+        else
+        {
+            var deleteImage = await _attachmentService.DeleteAsync(member.Photo!, ct);
+            if (deleteImage.IsFailure)
+                return Result.Failure("Failed to create member and delete image.", ErrorType.Failure);
+
+            return Result.Failure("Failed to create member.", ErrorType.Failure);
+        }
     }
 
     public async Task<Result<MemberDetailsDto>> GetDetailsAsync(int id, CancellationToken ct = default)
@@ -98,6 +119,9 @@ public class MemberService(
 
         if (member.Name != updateDto.Name)
             return Result.Failure("Member name not allowed to update.", ErrorType.Validation);
+
+        if (member.Photo != updateDto.PhotoUrl)
+            return Result.Failure("Member photo not allowed to update.", ErrorType.Validation);
 
         if (await _unitOfWork.Members.IsEmailTakenAsync(updateDto.Email, id, ct))
             return Result.Failure("Email is already taken.", ErrorType.Validation, nameof(updateDto.Email));

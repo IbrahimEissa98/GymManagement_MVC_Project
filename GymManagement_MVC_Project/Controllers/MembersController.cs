@@ -1,4 +1,5 @@
 ﻿using AutoMapper;
+using GymManagement_MVC_Project.BLL.Attachments;
 using GymManagement_MVC_Project.BLL.DTOs.Member;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.PL.ViewModels.HealthRecord;
@@ -7,9 +8,13 @@ using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagement_MVC_Project.PL.Controllers;
 
-public class MembersController(IMemberService memberService, IMapper mapper) : Controller
+public class MembersController(
+    IMemberService memberService,
+    IMapper mapper,
+    IAttachmentService attachmentService) : Controller
 {
     private readonly IMapper _mapper = mapper;
+    private readonly IAttachmentService _attachmentService = attachmentService;
 
     [HttpGet]
     public async Task<IActionResult> Index(CancellationToken ct)
@@ -180,5 +185,15 @@ public class MembersController(IMemberService memberService, IMapper mapper) : C
             TempData["FailMessage"] = result.Error;
 
         return RedirectToAction(nameof(Index));
+    }
+
+    [HttpGet]
+    public async Task<IActionResult> Photo(string storageKey)
+    {
+        var stream = await _attachmentService.GetAsync(storageKey);
+        if (stream.IsFailure || stream is null)
+            return NotFound();
+
+        return File(stream.Value.stream, stream.Value.contentType);
     }
 }

@@ -59,7 +59,10 @@
 									<tr class="align-middle @(member.IsDeleted ? "table-danger" : "")">
 										<td>
 											<span class="avatar">
-												<img src="@(string.IsNullOrWhiteSpace(member.PhotoUrl) ? Url.Content("~/images/User.jpg") : member.PhotoUrl)" alt="Default Avatar" class="rounded-circle"
+												<img src="@(string.IsNullOrWhiteSpace(member.PhotoUrl) 
+													? Url.Content("~/images/User.jpg") 
+													: Url.Action("Photo", "Members", new {storageKey = member.PhotoUrl}))" 
+													alt="Default Avatar" class="rounded-circle"
 													 style="width: 40px; height: 40px;" />
 											</span>
 										</td>

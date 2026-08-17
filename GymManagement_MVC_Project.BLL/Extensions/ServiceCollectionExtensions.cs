@@ -1,4 +1,5 @@
-﻿using GymManagement_MVC_Project.BLL.Providers;
+﻿using GymManagement_MVC_Project.BLL.Attachments;
+using GymManagement_MVC_Project.BLL.Providers;
 using GymManagement_MVC_Project.BLL.Providers.Contracts;
 using GymManagement_MVC_Project.BLL.Services;
 using GymManagement_MVC_Project.BLL.Services.Contracts;
@@ -17,6 +18,7 @@ public static class ServiceCollectionExtensions
         services.AddScoped<ISessionService, SessionService>();
         services.AddScoped<IMembershipService, MembershipService>();
         services.AddScoped<IBookingService, BookingService>();
+        services.AddScoped<IAttachmentService, AttachmentService>();
 
         services.AddSingleton<IDateTimeProvider, DateTimeProvider>();
 

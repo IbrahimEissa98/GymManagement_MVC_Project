@@ -1,9 +1,11 @@
 ﻿using GymManagement_MVC_Project.BLL.DTOs.HealthRecord;
+using Microsoft.AspNetCore.Http;
 
 namespace GymManagement_MVC_Project.BLL.DTOs.Member;
 
 public class MemberCreateDto
 {
+    public IFormFile? PhotoFile { get; set; }
     public string Name { get; set; } = default!;
     public string Email { get; set; } = default!;
     public string Phone { get; set; } = default!;
