@@ -1,7 +1,6 @@
 ﻿using GymManagement_MVC_Project.BLL.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
-using SkiaSharp;
 
 namespace GymManagement_MVC_Project.BLL.Attachments;
 
@@ -98,19 +97,21 @@ public class AttachmentService(IHostEnvironment hostEnv) : IAttachmentService
             return Result.Failure("File size exceeded.", ErrorType.Failure);
 
         var extension = Path.GetExtension(formFile.FileName);
-        if (extension is null || !AttachmentsRules.allowedExtensions.Contains(extension))
+        if (string.IsNullOrWhiteSpace(extension) || !AttachmentsRules.allowedExtensions.Contains(extension))
             return Result.Failure("Invalid photo extension.", ErrorType.Validation);
 
         try
         {
             await using var stream = formFile.OpenReadStream();
-            if (!stream.CanRead)
+            if (stream is null || !stream.CanRead)
                 return Result.Failure("Cannot read this photo.", ErrorType.Failure);
 
-            var codec = SKCodec.Create(stream);
-            if (codec is null)
-                return Result.Failure("Invalid image file.", ErrorType.Failure);
+            // SkiaSharp freeze at deployment
+            //var codec = SKCodec.Create(stream);
+            //if (codec is null)
+            //    return Result.Failure("Invalid image file.", ErrorType.Failure);
 
+            // SixLabors.ImageSharp is paid
             //var info = await Image.IdentifyAsync(stream, ct);
             //if (info is null)
             //    return Result.Failure("Invalid image.", ErrorType.Failure);

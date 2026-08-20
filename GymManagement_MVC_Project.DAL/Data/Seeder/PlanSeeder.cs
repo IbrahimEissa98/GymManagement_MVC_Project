@@ -54,8 +54,8 @@ internal class PlanSeeder
 
     internal static async Task SeedPlansFromJsonAsync(GymDbContext dbContext)
     {
-        //if (await dbContext.Plans.AnyAsync())
-        //    return;
+        if (await dbContext.Plans.AnyAsync())
+            return;
 
         var seederPlans = await SeedJsonLoader.LoadAsync<PlanSeedModel>("plans.json");
         if (seederPlans is null || !seederPlans.Any())
