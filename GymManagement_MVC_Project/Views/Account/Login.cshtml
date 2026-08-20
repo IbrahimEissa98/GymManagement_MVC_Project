@@ -165,10 +165,18 @@
 						<!-- Demo / Complete Form -->
 						<button type="button"
 								class="btn btn-demo w-100 mt-3"
-								id="fillFormBtn">
+								id="fillFormBtnSuper">
 
 							<i class="bi bi-magic me-2"></i>
-							Complete Form
+							Complete Form With Super Admin
+
+						</button>
+						<button type="button"
+								class="btn btn-demo w-100 mt-3"
+								id="fillFormBtnAdmin">
+
+							<i class="bi bi-magic me-2"></i>
+							Complete Form With Admin
 
 						</button>
 
@@ -270,7 +278,8 @@
 
         const rememberMe = document.getElementById("RememberMe");
 
-        const fillFormBtn = document.getElementById("fillFormBtn");
+        const fillFormBtnSuper = document.getElementById("fillFormBtnSuper");
+        const fillFormBtnAdmin = document.getElementById("fillFormBtnAdmin");
 
         const loginForm = document.getElementById("loginForm");
 
@@ -300,15 +309,27 @@
         /*
         * Complete the login form
         */
-        fillFormBtn.addEventListener("click", function () {
+        fillFormBtnSuper.addEventListener("click", function () {
+        emailInput.value = "superadmin@gym.com";
+        passwordInput.value = "SuperAdmin@123";
+        rememberMe.checked = true;
+
+        fillFormBtnSuper.innerHTML = '<i class="bi bi-check-lg me-2"></i>Form Completed';
+
+        setTimeout(function () {
+        fillFormBtnSuper.innerHTML = '<i class="bi bi-magic me-2"></i>Complete Form With Super Admin';
+        }, 1500);
+        });
+
+        fillFormBtnAdmin.addEventListener("click", function () {
         emailInput.value = "admin@gym.com";
         passwordInput.value = "Admin@123";
         rememberMe.checked = true;
 
-        fillFormBtn.innerHTML = '<i class="bi bi-check-lg me-2"></i>Form Completed';
+        fillFormBtnAdmin.innerHTML = '<i class="bi bi-check-lg me-2"></i>Form Completed';
 
         setTimeout(function () {
-        fillFormBtn.innerHTML = '<i class="bi bi-magic me-2"></i>Complete Form';
+        fillFormBtnAdmin.innerHTML = '<i class="bi bi-magic me-2"></i>Complete Form With Admin';
         }, 1500);
         });
 

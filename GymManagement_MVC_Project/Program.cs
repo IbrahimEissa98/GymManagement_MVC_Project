@@ -99,7 +99,7 @@ var roleManager = scope.ServiceProvider.GetRequiredService<RoleManager<AppIdenti
 if (app.Environment.IsDevelopment())
 {
     await dbContext.Database.MigrateAsync();
-    await DatabaseSeeder.SeedAllAsync(dbContext, userManager, roleManager, app.Configuration);
+    await DatabaseSeeder.SeedAllJsonAsync(dbContext, userManager, roleManager, app.Configuration);
 }
 else
 {
