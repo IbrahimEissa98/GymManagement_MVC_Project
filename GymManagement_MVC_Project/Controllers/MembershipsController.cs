@@ -1,10 +1,12 @@
 ﻿using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.PL.Extensions.Mapping;
 using GymManagement_MVC_Project.PL.ViewModels.Membership;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagement_MVC_Project.PL.Controllers;
 
+[Authorize(Roles = "SuperAdmin")]
 public class MembershipsController(IMembershipService membershipService) : Controller
 {
     private readonly IMembershipService _membershipService = membershipService;

@@ -1,9 +1,11 @@
 using GymManagement_MVC_Project.BLL.Services.Contracts;
 using GymManagement_MVC_Project.PL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
 
 namespace GymManagement_MVC_Project.PL.Controllers;
 
+[AllowAnonymous]
 public class HomeController(IHomeService homeService) : Controller
 {
     private readonly IHomeService _homeService = homeService;

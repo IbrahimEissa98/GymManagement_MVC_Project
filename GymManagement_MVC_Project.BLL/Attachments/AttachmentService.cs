@@ -1,7 +1,7 @@
 ﻿using GymManagement_MVC_Project.BLL.Common;
 using Microsoft.AspNetCore.Http;
 using Microsoft.Extensions.Hosting;
-using SixLabors.ImageSharp;
+using SkiaSharp;
 
 namespace GymManagement_MVC_Project.BLL.Attachments;
 
@@ -98,7 +98,7 @@ public class AttachmentService(IHostEnvironment hostEnv) : IAttachmentService
             return Result.Failure("File size exceeded.", ErrorType.Failure);
 
         var extension = Path.GetExtension(formFile.FileName);
-        if (extension is null || AttachmentsRules.allowedExtensions.Contains(extension))
+        if (extension is null || !AttachmentsRules.allowedExtensions.Contains(extension))
             return Result.Failure("Invalid photo extension.", ErrorType.Validation);
 
         try
@@ -106,11 +106,16 @@ public class AttachmentService(IHostEnvironment hostEnv) : IAttachmentService
             await using var stream = formFile.OpenReadStream();
             if (!stream.CanRead)
                 return Result.Failure("Cannot read this photo.", ErrorType.Failure);
-            var info = await Image.IdentifyAsync(stream, ct);
-            if (info is null)
-                return Result.Failure("Invalid image.", ErrorType.Failure);
-            if (info.Width > 3000 || info.Height > 3000)
-                return Result.Failure("Image out of dimensions.", ErrorType.Failure);
+
+            var codec = SKCodec.Create(stream);
+            if (codec is null)
+                return Result.Failure("Invalid image file.", ErrorType.Failure);
+
+            //var info = await Image.IdentifyAsync(stream, ct);
+            //if (info is null)
+            //    return Result.Failure("Invalid image.", ErrorType.Failure);
+            //if (codecResult.Width > 3000 || info.Height > 3000)
+            //    return Result.Failure("Image out of dimensions.", ErrorType.Failure);
 
             return Result.Success();
         }

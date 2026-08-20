@@ -1,15 +1,16 @@
-﻿using GymManagement_MVC_Project.DAL.Models;
-using GymManagement_MVC_Project.DAL.Models.Interceptors;
+﻿using GymManagement_MVC_Project.DAL.Identity;
+using GymManagement_MVC_Project.DAL.Models;
+using Microsoft.AspNetCore.Identity.EntityFrameworkCore;
 using Microsoft.EntityFrameworkCore;
 using System.Linq.Expressions;
 
 namespace GymManagement_MVC_Project.DAL.Data.Contexts;
 
-public class GymDbContext : DbContext
+public class GymDbContext : IdentityDbContext<AppIdentityUser, AppIdentityRole, string>
 {
-    public GymDbContext(DbContextOptions<GymDbContext> options):base(options)
+    public GymDbContext(DbContextOptions<GymDbContext> options) : base(options)
     {
-        
+
     }
 
     protected override void OnModelCreating(ModelBuilder modelBuilder)
@@ -26,6 +27,15 @@ public class GymDbContext : DbContext
         }
 
         modelBuilder.ApplyConfigurationsFromAssembly(typeof(GymDbContext).Assembly);
+
+        base.OnModelCreating(modelBuilder);
+
+        modelBuilder.Entity<AppIdentityUser>()
+                    .Property(u => u.FullName)
+                    .HasMaxLength(150);
+        modelBuilder.Entity<AppIdentityRole>()
+                    .Property(u => u.DisplayName)
+                    .HasMaxLength(50);
     }
 
     public DbSet<Plan> Plans { get; set; }
