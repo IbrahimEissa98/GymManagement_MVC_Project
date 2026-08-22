@@ -1,0 +1,18 @@
+﻿@* Alert Messages *@
+@if (TempData["SuccessMessage"] is string successMessage)
+{
+	<div id="Alert" class="alert alert-success alert-dismissible fade show">
+		<i class="bi bi-check-circle-fill me-2"></i>
+		@successMessage
+		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	</div>
+}
+
+else if (TempData["FailMessage"] is string failedMessage)
+{
+	<div id="Alert" class="alert alert-danger alert-dismissible fade show">
+		<i class="bi bi-exclamation-triangle-fill me-2"></i>
+		@failedMessage
+		<button type="button" class="btn-close" data-bs-dismiss="alert"></button>
+	</div>
+}

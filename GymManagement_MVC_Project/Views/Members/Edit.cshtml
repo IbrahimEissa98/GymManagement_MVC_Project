@@ -1,0 +1,159 @@
+﻿@model MemberToUpdateViewModel
+
+@{
+	ViewData["Title"] = "Edit Member";
+}
+
+@section Styles {
+	<partial name="_CardDisplayStylePartial" />
+	<partial name="_BootstrapValidationClassesStylePartial" />
+}
+
+
+<div class="container pt-5">
+
+	<nav class="breadcrumb-nav mb-3 pt-5" aria-label="Breadcrumb">
+		<a asp-controller="Members" asp-action="Index">
+			<i class="bi bi-people me-1"></i>Members
+		</a>
+		<span class="separator">/</span>
+		<span class="text-muted">Edit Member</span>
+	</nav>
+
+	<div class="row justify-content-center">
+
+		<div class="col-lg-8 col-md-10">
+
+			<div class="card plan-detail-card border-0">
+
+				<div class="card-header text-center text-white">
+
+					<img src="@(string.IsNullOrWhiteSpace(Model.PhotoUrl)
+						 ? Url.Content("~/images/User.jpg")
+						 : Url.Action("Photo", "Members", new { storageKey = Model.PhotoUrl }))"
+						 class="member-photo"
+						 alt="@Model.Name" />
+
+					<h2 class="fw-bold mt-3 mb-0">
+						@Model.Name
+					</h2>
+
+				</div>
+
+				<form id="updateForm" asp-action="Edit" method="post">
+
+					<input hidden asp-for="Name" class="form-control" />
+					<div class="card-body">
+
+						<div class="row g-3">
+
+							<div class="col-12">
+								<div class="detail-item h-100">
+
+									<label asp-for="Email" class="form-label fw-semibold">
+										<i class="bi bi-envelope me-2 text-primary-color"></i>
+										Email
+									</label>
+
+									<input asp-for="Email" class="form-control" />
+									<span asp-validation-for="Email" class="text-danger"></span>
+
+								</div>
+							</div>
+
+							<div class="col-md-6">
+								<div class="detail-item h-100">
+
+									<label asp-for="Phone" class="form-label fw-semibold">
+										<i class="bi bi-telephone me-2 text-primary-color"></i>
+										Phone
+									</label>
+
+									<input asp-for="Phone" class="form-control" />
+									<span asp-validation-for="Phone" class="text-danger"></span>
+
+								</div>
+							</div>
+
+							<div class="col-md-6">
+								<div class="detail-item h-100">
+
+									<label asp-for="BuildingNumber" class="form-label fw-semibold">
+										<i class="bi bi-building me-2 text-primary-color"></i>
+										Building Number
+									</label>
+
+									<input asp-for="BuildingNumber" class="form-control" />
+									<span asp-validation-for="BuildingNumber" class="text-danger"></span>
+
+								</div>
+							</div>
+
+							<div class="col-md-6">
+								<div class="detail-item h-100">
+
+									<label asp-for="City" class="form-label fw-semibold">
+										<i class="bi bi-geo-alt me-2 text-primary-color"></i>
+										City
+									</label>
+
+									<input asp-for="City" class="form-control" />
+									<span asp-validation-for="City" class="text-danger"></span>
+
+								</div>
+							</div>
+
+							<div class="col-md-6">
+								<div class="detail-item h-100">
+
+									<label asp-for="Street" class="form-label fw-semibold">
+										<i class="bi bi-signpost me-2 text-primary-color"></i>
+										Street
+									</label>
+
+									<input asp-for="Street" class="form-control" />
+									<span asp-validation-for="Street" class="text-danger"></span>
+
+								</div>
+							</div>
+
+						</div>
+
+					</div>
+
+					<div class="card-footer">
+
+						<div class="d-flex gap-2">
+
+							<a asp-action="Index"
+							   class="btn btn-outline flex-fill">
+								<i class="bi bi-arrow-left me-1"></i>
+								Back to Members
+							</a>
+
+							<button id="submitBtn" type="submit" disabled
+									class="btn get-started flex-fill">
+								<i class="bi bi-check-circle me-1"></i>
+								Save Changes
+							</button>
+
+						</div>
+
+					</div>
+
+				</form>
+
+			</div>
+
+		</div>
+
+	</div>
+
+</div>
+
+@section Scripts {
+	<partial name="_ValidationScriptsPartial" />
+	<partial name="_DisabledSubmitBtnScript" />
+}
+
+

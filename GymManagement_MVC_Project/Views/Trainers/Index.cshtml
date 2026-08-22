@@ -1,0 +1,187 @@
+﻿@model IReadOnlyList<TrainerIndexViewModel>
+
+@{
+	ViewData["Title"] = "Trainers";
+}
+
+<div class="container pt-5">
+	<main role="main" class="pb-3 pt-5">
+		<partial name="_TempDataAlertMessage" />
+
+		<header class="page-header d-flex flex-wrap justify-content-between align-items-center gap-3 mt-3">
+			<div class="d-flex align-items-center gap-3">
+				<div class="page-icon">
+					<i class="bi bi-person-arms-up"></i>
+				</div>
+				<div>
+					<h2 class="text-primary-color mb-1 fw-bold">Our Trainers</h2>
+					<p class="text-muted mb-0">Professional fitness instructors</p>
+				</div>
+			</div>
+			<a asp-controller="Trainers" asp-action="Create" class="btn get-started btn-sm">
+				<i class="bi bi-plus-lg me-1"></i>Add New Trainer
+			</a>
+		</header>
+
+		<div class="card plan-detail-card border-0 overflow-visible">
+
+			<div class="card-header py-2 d-flex justify-content-between align-items-center">
+
+				<h5 class="mb-0 text-white">
+					<i class="bi bi-person-workspace me-2"></i>
+					Trainers
+				</h5>
+
+				<span class="badge bg-light text-dark">
+					@Model.Count() Trainer(s)
+				</span>
+
+			</div>
+
+			@if (Model.Any())
+			{
+				<div class="table-responsive overflow-visible">
+
+					<table class="table align-middle mb-0">
+
+						<thead>
+
+							<tr>
+								<th>Name</th>
+								<th>Email</th>
+								<th>Phone</th>
+								<th>Specialization</th>
+								<th class="text-center">Actions</th>
+							</tr>
+
+						</thead>
+
+						<tbody>
+
+							@foreach (var trainer in Model)
+							{
+								<tr class="@(trainer.IsDeleted ? "table-danger" : "")">
+
+									<td class="fw-semibold">
+										@trainer.Name
+									</td>
+
+									<td>
+										@trainer.Email
+									</td>
+
+									<td>
+										@trainer.Phone
+									</td>
+
+									<td>
+										<span class="badge bg-primary-color">
+											@trainer.Specialize
+										</span>
+									</td>
+
+									<td class="text-center">
+
+										<div class="dropdown">
+
+											<button class="btn btn-link fs-5 btn-outline-secondary border-0"
+													data-bs-toggle="dropdown">
+												<i class="bi bi-three-dots"></i>
+											</button>
+
+											<ul class="dropdown-menu dropdown-menu-end">
+												@if (!trainer.IsDeleted)
+												{
+												<li>
+
+													<a asp-action="Details"
+													   asp-route-id="@trainer.Id"
+													   class="dropdown-item">
+
+														<i class="bi bi-eye me-2 text-primary-color"></i>
+														Details
+
+													</a>
+
+												</li>
+
+												<li>
+
+													<a asp-action="Edit"
+													   asp-route-id="@trainer.Id"
+													   class="dropdown-item">
+
+														<i class="bi bi-pencil me-2 text-primary-color"></i>
+														Edit
+
+													</a>
+
+												</li>
+
+												<li>
+													<hr class="dropdown-divider">
+												</li>
+
+												<li>
+
+													<a asp-action="Delete"
+													   asp-route-id="@trainer.Id"
+													   class="dropdown-item text-danger">
+
+														<i class="bi bi-person-x me-2"></i>
+														Deactivate
+
+													</a>
+
+												</li>
+												}
+												else
+												{
+													<li>
+														<a asp-controller="Trainers" asp-action="Activate" asp-route-id="@trainer.Id"
+														   class="dropdown-item d-flex align-items-center gap-3 text-warning">
+															<i class="bi bi-check2-circle text-warning"></i>
+															<span>Activate</span>
+														</a>
+													</li>
+												}
+
+											</ul>
+
+										</div>
+
+									</td>
+
+								</tr>
+							}
+
+						</tbody>
+
+					</table>
+
+				</div>
+			}
+			else
+			{
+				<div class="text-center py-5">
+
+					<i class="bi bi-person-workspace display-2 text-muted mb-3"></i>
+
+					<h4 class="fw-bold">
+						No Trainers Found
+					</h4>
+
+					<p class="text-muted mb-4">
+						Start by adding your first trainer.
+					</p>
+
+				</div>
+			}
+
+		</div>
+	</main>
+</div>
+
+@section Scripts {
+	<partial name="_AlertDismissScript" />
+}

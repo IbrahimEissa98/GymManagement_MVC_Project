@@ -1,0 +1,27 @@
+﻿<script>
+	const form = document.getElementById("updateForm");
+	const submitBtn = document.getElementById("submitBtn");
+
+	// Save the initial form state
+	const initialData = new FormData(form);
+
+	function hasChanged() {
+		const currentData = new FormData(form);
+
+		for (const [key, value] of initialData.entries()) {
+			if (currentData.get(key) !== value) {
+				return true;
+			}
+		}
+
+		return false;
+	}
+
+	form.addEventListener("input", () => {
+		submitBtn.disabled = !hasChanged();
+	});
+
+	form.addEventListener("change", () => {
+		submitBtn.disabled = !hasChanged();
+	});
+</script>

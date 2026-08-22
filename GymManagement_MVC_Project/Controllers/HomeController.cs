@@ -1,25 +1,28 @@
-using GymManagement_MVC_Project.Models;
+using GymManagement_MVC_Project.BLL.Services.Contracts;
+using GymManagement_MVC_Project.PL.ViewModels;
+using Microsoft.AspNetCore.Authorization;
 using Microsoft.AspNetCore.Mvc;
-using System.Diagnostics;
 
-namespace GymManagement_MVC_Project.Controllers
+namespace GymManagement_MVC_Project.PL.Controllers;
+
+[AllowAnonymous]
+public class HomeController(IHomeService homeService) : Controller
 {
-    public class HomeController : Controller
+    private readonly IHomeService _homeService = homeService;
+
+    public async Task<IActionResult> Index(CancellationToken ct)
     {
-        public IActionResult Index()
+        var analytics = await _homeService.GetAnalyticsAsync(ct);
+        var model = new HomeAnalyticsViewModel
         {
-            return View();
-        }
-
-        public IActionResult Privacy()
-        {
-            return View();
-        }
-
-        [ResponseCache(Duration = 0, Location = ResponseCacheLocation.None, NoStore = true)]
-        public IActionResult Error()
-        {
-            return View(new ErrorViewModel { RequestId = Activity.Current?.Id ?? HttpContext.TraceIdentifier });
-        }
+            TotalMembers = analytics.Value!.TotalMembers,
+            ActiveMembers = analytics.Value!.ActiveMembers,
+            TotalTrainers = analytics.Value!.TotalTrainers,
+            UpcomingSessions = analytics.Value!.UpcomingSessions,
+            OngoingSessions = analytics.Value!.OngoingSessions,
+            CompletedSessions = analytics.Value!.CompletedSessions
+        };
+        return View(model);
     }
+
 }

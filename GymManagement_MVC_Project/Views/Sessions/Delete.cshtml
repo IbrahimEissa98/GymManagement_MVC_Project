@@ -1,0 +1,158 @@
+﻿@model SessionDeleteViewModel
+
+@{
+    ViewData["Title"] = "Delete Session";
+}
+
+<div class="container pt-5">
+
+    <!-- Breadcrumb -->
+    <nav class="breadcrumb-nav mb-3 pt-5" aria-label="Breadcrumb">
+        <a asp-controller="Sessions" asp-action="Index">
+            <i class="bi bi-calendar-event me-1"></i>Sessions
+        </a>
+
+        <span class="separator">/</span>
+
+        <span class="text-muted">Delete Session</span>
+    </nav>
+
+    <div class="row justify-content-center">
+        <div class="col-lg-7 col-md-9">
+
+            <div class="card plan-detail-card border-0">
+
+                <!-- Header -->
+                <div class="card-header text-white text-center">
+
+                    <i class="bi bi-calendar-x display-4 mb-3 d-block"></i>
+
+                    <h2 class="mb-2 fw-bold">
+                        Delete Session
+                    </h2>
+
+                    <span class="badge bg-warning text-dark fs-6">
+                        Soft Delete
+                    </span>
+
+                </div>
+
+                <!-- Body -->
+                <div class="card-body p-4 p-md-5">
+
+                    <div class="text-center mb-4">
+                        <h4 class="fw-bold mb-2">
+                            @Model.CategoryName
+                        </h4>
+
+                        <p class="text-muted mb-0">
+                            Are you sure you want to delete this session?
+                        </p>
+                    </div>
+
+                    <!-- Session Details -->
+                    <div class="plan-details d-flex flex-column gap-3">
+
+                        <!-- Category -->
+                        <div class="detail-item">
+                            <div class="d-flex align-items-center">
+
+                                <div class="icon-box me-3">
+                                    <i class="bi bi-calendar-event text-primary-color fs-4"></i>
+                                </div>
+
+                                <div>
+                                    <h6 class="mb-1 text-uppercase small fw-semibold">
+                                        Category
+                                    </h6>
+
+                                    <p class="mb-0 fw-bold fs-5">
+                                        @Model.CategoryName
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+
+                        <!-- Trainer -->
+                        <div class="detail-item">
+                            <div class="d-flex align-items-center">
+
+                                <div class="icon-box me-3">
+                                    <i class="bi bi-person-circle text-primary-color fs-4"></i>
+                                </div>
+
+                                <div>
+                                    <h6 class="mb-1 text-uppercase small fw-semibold">
+                                        Trainer
+                                    </h6>
+
+                                    <p class="mb-0 fw-bold fs-5">
+                                        @Model.TrainerName
+                                    </p>
+                                </div>
+
+                            </div>
+                        </div>
+                    </div>
+
+                    <!-- Warning -->
+                    <div class="alert alert-warning mt-4 mb-0" role="alert">
+
+                        <div class="d-flex align-items-start">
+
+                            <i class="bi bi-exclamation-triangle-fill me-2 mt-1"></i>
+
+                            <div>
+                                <strong>Soft Delete</strong>
+
+                                <p class="mb-0 mt-1">
+                                    This session will be removed from the active sessions.
+                                    Its data will be preserved and can be restored later.
+                                </p>
+                            </div>
+
+                        </div>
+
+                    </div>
+
+                </div>
+
+                <!-- Footer -->
+                <div class="card-footer">
+
+                    <form asp-action="Delete"
+                          asp-route-id="@Context.Request.RouteValues["id"]"
+                          method="post">
+
+                        <div class="d-flex gap-2">
+
+                            <a asp-controller="Sessions"
+                               asp-action="Index"
+                               class="btn btn-outline flex-fill">
+
+                                <i class="bi bi-arrow-left me-1"></i>
+                                Cancel
+
+                            </a>
+
+                            <button type="submit"
+                                    class="btn btn-fill bg-danger border-danger flex-fill">
+
+                                <i class="bi bi-trash me-1"></i>
+                                Delete Session
+
+                            </button>
+
+                        </div>
+
+                    </form>
+
+                </div>
+
+            </div>
+
+        </div>
+    </div>
+
+</div>
