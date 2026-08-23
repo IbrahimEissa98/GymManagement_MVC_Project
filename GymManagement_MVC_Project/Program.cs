@@ -54,7 +54,7 @@ builder.Services.AddIdentity<AppIdentityUser, AppIdentityRole>(op =>
 builder.Services.ConfigureApplicationCookie(config =>
 {
     config.AccessDeniedPath = "";
-    config.ExpireTimeSpan = TimeSpan.FromHours(12);
+    config.ExpireTimeSpan = TimeSpan.FromHours(24);
     config.SlidingExpiration = true;
 });
 

@@ -139,7 +139,7 @@ public class MemberService(
     public async Task<Result> DeleteAsync(int id, CancellationToken ct = default)
     {
         var member = await _unitOfWork.Members.GetByIdWithIncludesAsync(id, ct: ct,
-            includes: m => m.HealthRecord);
+            includes: [m => m.HealthRecord, m => m.Bookings, m => m.Memberships]);
 
         if (member is null)
             return Result.Failure("Member not found.", ErrorType.NotFound);
@@ -168,8 +168,8 @@ public class MemberService(
 
     public async Task<Result> ActivateAsync(int id, CancellationToken ct = default)
     {
-        var member = await _unitOfWork.Members.GetByIdWithIncludesAsync(id, includeDeleted: true, ct: ct,
-            includes: [m => m.HealthRecord, m => m.Bookings, m => m.Memberships]);
+        var member = await _unitOfWork.Members.GetByIdWithIncludesAsync(id, includeDeleted: true,
+            ct: ct, includes: [m => m.HealthRecord]);
 
         if (member is null)
             return Result.Failure("Member not found.", ErrorType.NotFound);
@@ -180,25 +180,25 @@ public class MemberService(
         member.HealthRecord.IsDeleted = false;
         member.HealthRecord.DeletedAt = null;
 
-        if (member.Bookings.Count > 0)
-        {
-            foreach (var booking in member.Bookings)
-            {
-                booking.IsDeleted = false;
-                booking.DeletedAt = null;
-            }
-        }
+        //if (member.Bookings.Count > 0)
+        //{
+        //    foreach (var booking in member.Bookings)
+        //    {
+        //        booking.IsDeleted = false;
+        //        booking.DeletedAt = null;
+        //    }
+        //}
 
-        if (member.Memberships.Count > 0)
-        {
-            foreach (var membership in member.Memberships)
-            {
-                membership.IsDeleted = false;
-                membership.DeletedAt = null;
-            }
-        }
+        //if (member.Memberships.Count > 0)
+        //{
+        //    foreach (var membership in member.Memberships)
+        //    {
+        //        membership.IsDeleted = false;
+        //        membership.DeletedAt = null;
+        //    }
+        //}
 
-        _unitOfWork.Members.Update(member);
+        //_unitOfWork.Members.Update(member);
 
         var result = await _unitOfWork.CommitAsync(ct);
 
