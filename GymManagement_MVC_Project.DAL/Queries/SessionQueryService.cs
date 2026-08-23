@@ -22,7 +22,7 @@ public class SessionQueryService(GymDbContext gymDbContext) : ISessionQueryServi
                 StartDate = s.StartDate,
                 EndDate = s.EndDate,
                 CategoryName = s.Category.Name,
-                BookedCount = s.Bookings.Count,
+                BookedCount = s.Bookings.Where(b => b.IsDeleted == false).Count(),
                 TrainerName = s.Trainer.Name,
                 IsDeleted = s.IsDeleted
             }).ToListAsync(ct);

@@ -89,6 +89,8 @@ public class MembershipService(
             return Result.Failure("Membership not found", ErrorType.NotFound);
         if (membership.Status == MembershipStatus.Expired)
             return Result.Failure("Can not cancel Expired membership.", ErrorType.Failure);
+        if (await _unitOfWork.Members.IsHasUpcomingBookingAsync(membership.MemberId, _clock.UtcNow, ct))
+            return Result.Failure("Can not delete membership for member with upcoming Bookings", ErrorType.Failure);
 
         try
         {
