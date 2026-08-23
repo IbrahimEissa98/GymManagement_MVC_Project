@@ -32,6 +32,7 @@
 						 ? Url.Content("~/images/User.jpg")
 						 : Url.Action("Photo", "Members", new { storageKey = Model.PhotoUrl }))"
 						 class="member-photo"
+						 onerror="this.onerror=null; this.src='@Url.Content("~/images/User.jpg")';"
 						 alt="@Model.Name" />
 
 					<h2 class="fw-bold mt-3 mb-0">

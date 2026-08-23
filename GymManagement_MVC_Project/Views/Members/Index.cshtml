@@ -62,7 +62,8 @@
 												<img src="@(string.IsNullOrWhiteSpace(member.PhotoUrl) 
 													? Url.Content("~/images/User.jpg") 
 													: Url.Action("Photo", "Members", new {storageKey = member.PhotoUrl}))" 
-													alt="Default Avatar" class="rounded-circle"
+													 onerror="this.onerror=null; this.src='@Url.Content("~/images/User.jpg")';"
+													alt="@member.Name" class="rounded-circle"
 													 style="width: 40px; height: 40px;" />
 											</span>
 										</td>

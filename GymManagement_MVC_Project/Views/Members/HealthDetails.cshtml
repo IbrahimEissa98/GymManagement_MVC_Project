@@ -28,6 +28,7 @@
 					<img src="@(string.IsNullOrWhiteSpace(Model.PhotoUrl)
 														 ? Url.Content("~/images/User.jpg")
 														 : Url.Action("Photo", "Members", new { storageKey = Model.PhotoUrl }))"
+						 onerror="this.onerror=null; this.src='@Url.Content("~/images/User.jpg")';"
 						 class="member-photo"
 						 alt="@Model.Name" />
 
